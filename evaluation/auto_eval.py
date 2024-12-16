@@ -18,17 +18,20 @@ SYSTEM_PROMPT = """As an evaluator for DOM and DOMer-2 benchmark, you will asses
    - After: Actual result after interaction
    - Ground Truth: Expected result for successful interaction
    - Expected Visual Changes: List of specific visual changes to verify
+   - Success Criteria: Specific conditions that must be met
 
 Your evaluation should:
 1. Compare the after screenshot with the ground truth screenshot
 2. Verify all listed visual changes occurred
-3. Pay special attention to the relevant regions where changes should occur
+3. Check if all success criteria are met
+4. Pay special attention to the relevant regions where changes should occur
 
 Provide your evaluation as:
 1. A score from 0-100 based on visual similarity and completion of expected changes
 2. 'SUCCESS' if score ≥ 90, otherwise 'NOT SUCCESS'
 3. Brief explanation of:
    - Visual changes observed/missing
+   - Success criteria met/unmet
    - Why the interaction succeeded or failed"""
 
 def encode_image(image_path: str) -> str:
@@ -57,11 +60,14 @@ Please compare:
 Expected visual changes:
 {json.dumps(ground_truth['visual_changes'], indent=2)}
 
+Success criteria:
+{json.dumps(ground_truth['success_criteria'], indent=2)}
+
 Provide:
 1. Similarity score (0-100)
 2. Success status
 3. Brief explanation"""},
-        {"role": "assistant", "content": "I'll examine the screenshots and evaluate based on visual similarity and expected changes."},
+        {"role": "assistant", "content": "I'll examine the screenshots and evaluate based on visual similarity, expected changes, and success criteria."},
         {"role": "user", "content": [
             {"type": "text", "text": "Before interaction:"},
             {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{encode_image(result['before_screenshot'])}"}},

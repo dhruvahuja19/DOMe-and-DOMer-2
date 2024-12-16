@@ -1,0 +1,108 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "DOM Task Schema",
+    "description": "Schema for DOM interaction tasks in the benchmark",
+    "type": "object",
+    "required": [
+        "web_name",
+        "id",
+        "task",
+        "web",
+        "element_type",
+        "interaction",
+        "target_element",
+        "target_html",
+        "ground_truth"
+    ],
+    "properties": {
+        "web_name": {
+            "type": "string",
+            "description": "Name of the website"
+        },
+        "id": {
+            "type": "string",
+            "description": "Unique identifier for the task",
+            "pattern": "^[a-z0-9_]+$"
+        },
+        "task": {
+            "type": "string",
+            "description": "Human-readable task description"
+        },
+        "web": {
+            "type": "string",
+            "description": "Website URL",
+            "format": "uri"
+        },
+        "element_type": {
+            "type": "string",
+            "description": "Type of HTML element to interact with",
+            "enum": ["input", "button", "link", "div", "span"]
+        },
+        "interaction": {
+            "type": "string",
+            "description": "Type of interaction to perform",
+            "enum": ["click", "type", "hover"]
+        },
+        "target_element": {
+            "type": "object",
+            "description": "How to find the element",
+            "required": ["type", "value"],
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "description": "Type of selector to use",
+                    "enum": ["id", "class", "text"]
+                },
+                "value": {
+                    "type": "string",
+                    "description": "Value of the selector"
+                }
+            }
+        },
+        "input_text": {
+            "type": "string",
+            "description": "Text to type (only required for type interactions)"
+        },
+        "target_html": {
+            "type": "string",
+            "description": "The actual HTML element to match against for validation"
+        },
+        "ground_truth": {
+            "type": "object",
+            "description": "Validation data",
+            "required": [
+                "screenshot",
+                "description",
+                "visual_changes",
+                "success_criteria"
+            ],
+            "properties": {
+                "screenshot": {
+                    "type": "string",
+                    "description": "Filename of the ground truth screenshot",
+                    "pattern": "^[a-z0-9_]+\\.png$"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Description of the expected outcome"
+                },
+                "visual_changes": {
+                    "type": "array",
+                    "description": "List of expected visual changes",
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 1
+                },
+                "success_criteria": {
+                    "type": "array",
+                    "description": "List of specific conditions that must be met for success",
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 1
+                }
+            }
+        }
+    }
+}

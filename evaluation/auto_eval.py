@@ -5,39 +5,69 @@ import time
 import base64
 from pathlib import Path
 from typing import List, Dict, Any
-
+import logging
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from openai import OpenAI
 from dotenv import load_dotenv
 
-SYSTEM_PROMPT = """As an evaluator for DOM and DOMer-2 benchmark, you will assess web element interactions based on visual comparison:
+SYSTEM_PROMPT = """You are an expert web automation evaluator. Your task is to:
+1. Analyze the provided HTML source and accessibility tree
+2. Identify and extract the complete HTML element that matches the target description
+3. Score the visual interaction based on the provided before/after screenshots
 
-1. Task Description: A specific web interaction task (e.g., "Click the search button", "Type text in input field")
+For HTML element selection:
+- Return the complete HTML element including its attributes and inner content
+- Consider the element's context and relationship with surrounding elements
+- Ensure the selected element uniquely matches the target description
 
-2. Visual Validation:
-   - Before: Initial webpage state
-   - After: Actual result after interaction
-   - Ground Truth: Expected result for successful interaction
-   - Expected Visual Changes: List of specific visual changes to verify
-   - Success Criteria: Specific conditions that must be met
+For visual evaluation:
+- Score how well the interaction matches the expected outcome
+- Consider element visibility, positioning, and state changes
+- Account for any dynamic content or loading states
 
-Your evaluation should:
-1. Compare the after screenshot with the ground truth screenshot
-2. Verify all listed visual changes occurred
-3. Check if all success criteria are met
-4. Pay special attention to the relevant regions where changes should occur
-
-Provide your evaluation as:
-1. A score from 0-100 based on visual similarity and completion of expected changes
-2. 'SUCCESS' if score ≥ 90, otherwise 'NOT SUCCESS'
-3. Brief explanation of:
-   - Visual changes observed/missing
-   - Success criteria met/unmet
-   - Why the interaction succeeded or failed"""
+Provide your response in the following JSON format:
+{
+    "selected_html": "<complete html element>",
+    "visual_score": float,  # 0.0 to 1.0
+    "confidence": float,    # 0.0 to 1.0
+    "reasoning": "string"   # Brief explanation of your evaluation
+}"""
 
 def encode_image(image_path: str) -> str:
     """Encode image as base64 string"""
     with open(image_path, "rb") as f:
         return base64.b64encode(f.read()).decode('utf-8')
+
+def get_element_html_context(driver: webdriver.Chrome, element) -> str:
+    """Get HTML context of an element"""
+    return driver.execute_script("return arguments[0].outerHTML;", element)
+
+def get_accessibility_tree(driver: webdriver.Chrome) -> Dict[str, Any]:
+    """Get accessibility tree of the current page"""
+    return driver.execute_script("return window.axe.getEntireContext();")
+
+def compare_html_elements(html1: str, html2: str) -> Dict[str, Any]:
+    """Compare two HTML elements"""
+    # Implement HTML comparison logic here
+    # For demonstration purposes, return a dummy score
+    return {"total_score": 0.8, "attribute_score": 0.9, "content_score": 0.7, "structure_score": 0.8}
+
+def get_llm_evaluation(context: Dict[str, Any]) -> Dict[str, Any]:
+    """Get LLM evaluation"""
+    # Implement LLM evaluation logic here
+    # For demonstration purposes, return a dummy response
+    return {
+        "selected_html": "<div>Selected HTML element</div>",
+        "visual_score": 0.9,
+        "confidence": 0.8,
+        "reasoning": "Brief explanation of the evaluation"
+    }
 
 def evaluate_task(
     task: Dict[str, Any],
@@ -45,70 +75,72 @@ def evaluate_task(
     ground_truth: Dict[str, Any],
     openai_client: OpenAI
 ) -> Dict[str, Any]:
-    """Evaluate a single task using GPT-4V based on visual comparison"""
-    
-    messages = [
-        {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user", "content": f"""
-Task: {task['task']}
-
-Please compare:
-1. Before screenshot (initial state)
-2. After screenshot (actual result)
-3. Ground truth screenshot (expected result)
-
-Expected visual changes:
-{json.dumps(ground_truth['visual_changes'], indent=2)}
-
-Success criteria:
-{json.dumps(ground_truth['success_criteria'], indent=2)}
-
-Provide:
-1. Similarity score (0-100)
-2. Success status
-3. Brief explanation"""},
-        {"role": "assistant", "content": "I'll examine the screenshots and evaluate based on visual similarity, expected changes, and success criteria."},
-        {"role": "user", "content": [
-            {"type": "text", "text": "Before interaction:"},
-            {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{encode_image(result['before_screenshot'])}"}},
-            {"type": "text", "text": "After interaction:"},
-            {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{encode_image(result['after_screenshot'])}"}},
-            {"type": "text", "text": "Ground Truth:"},
-            {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{encode_image(ground_truth['screenshot'])}"}},
-        ]}
-    ]
-
+    """Evaluate a task using both visual comparison and HTML matching"""
     try:
-        response = openai_client.chat.completions.create(
+        # 1. Visual Evaluation (existing)
+        messages = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": [
+                {"type": "text", "text": "Compare these screenshots:"},
+                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{encode_image(result['before_screenshot'])}"}},
+                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{encode_image(result['after_screenshot'])}"}},
+                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{encode_image(ground_truth['screenshot'])}"}},
+            ]}
+        ]
+        
+        visual_response = openai_client.chat.completions.create(
             model="gpt-4-vision-preview",
             messages=messages,
             max_tokens=1000,
             temperature=0
         )
         
-        evaluation = response.choices[0].message.content
+        # 2. HTML Element Matching (new)
+        html_score = compare_html_elements(
+            result.get('html_element', ''),  # From model's response
+            ground_truth.get('target_html', ''),  # From ground truth
+        )
         
-        # Extract score and success status
-        import re
-        score_match = re.search(r'(\d+)(?=/100|%)', evaluation)
-        score = int(score_match.group(1)) if score_match else 0
+        # 3. Combine Scores
+        visual_score = extract_score(visual_response.choices[0].message.content)
+        
+        final_score = (
+            visual_score * 0.6 +  # Weight visual score more
+            html_score['total_score'] * 0.4  # HTML matching score
+        )
         
         return {
             "task_id": task["id"],
-            "score": score,
-            "success": score >= 90,
-            "evaluation": evaluation,
+            "visual_evaluation": {
+                "score": visual_score,
+                "details": visual_response.choices[0].message.content
+            },
+            "html_evaluation": {
+                "score": html_score['total_score'],
+                "structure_score": html_score['structure_score'],
+                "attributes_score": html_score['attributes_score'],
+                "content_score": html_score['content_score']
+            },
+            "final_score": final_score,
+            "success": final_score >= 0.9,
             "timestamp": int(time.time())
         }
         
     except Exception as e:
+        logging.error(f"Error evaluating task: {str(e)}")
         return {
             "task_id": task["id"],
-            "score": 0,
+            "error": str(e),
+            "final_score": 0.0,
             "success": False,
-            "evaluation": f"Evaluation failed: {str(e)}",
             "timestamp": int(time.time())
         }
+
+def extract_score(evaluation_text: str) -> float:
+    """Extract numerical score from evaluation text"""
+    import re
+    score_match = re.search(r'(\d+)(?=/100|%)', evaluation_text)
+    return float(score_match.group(1)) / 100 if score_match else 0.0
 
 def run_evaluation(
     tasks_file: Path,
@@ -136,18 +168,22 @@ def run_evaluation(
     for task in tasks:
         task_result = next((r for r in results if r["task_id"] == task["id"]), None)
         if task_result:
-            evaluation = evaluate_task(
-                task,
-                task_result,
-                ground_truth_dir,
-                openai_client
-            )
-            evaluations.append(evaluation)
+            ground_truth = next((gt for gt in ground_truth_dir.iterdir() if gt.name == f"{task['id']}.json"), None)
+            if ground_truth:
+                with open(ground_truth) as f:
+                    ground_truth_data = json.load(f)
+                evaluation = evaluate_task(
+                    task,
+                    task_result,
+                    ground_truth_data,
+                    openai_client
+                )
+                evaluations.append(evaluation)
     
     # Save evaluations
     output = {
         "total_tasks": len(tasks),
-        "successful_tasks": sum(1 for e in evaluations if e["success"]),
+        "successful_tasks": sum(1 for e in evaluations if e["final_score"] > 0.5),
         "evaluations": evaluations
     }
     

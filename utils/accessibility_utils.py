@@ -101,3 +101,59 @@ def format_accessibility_tree(tree: List[AccessibilityNode]) -> str:
     )
     
     return build_tree(root_node["nodeId"], nodes_map)
+
+def get_element_html_context(driver: webdriver.Chrome, element) -> Dict[str, Any]:
+    """Get HTML context for an element including its structure and surrounding elements."""
+    return {
+        "outer_html": element.get_attribute("outerHTML"),
+        "inner_html": element.get_attribute("innerHTML"),
+        "tag_name": element.tag_name,
+        "attributes": {
+            name: element.get_attribute(name) 
+            for name in ["id", "class", "name", "type", "value", "href", "src"]
+            if element.get_attribute(name)
+        },
+        "parent_tag": element.find_element("xpath", "..").tag_name if element else None,
+        "siblings": [
+            e.tag_name for e in element.find_elements("xpath", "../*")
+            if e != element
+        ][:3]  # Get up to 3 siblings for context
+    }
+
+def compare_html_elements(suggested: Dict[str, Any], target: Dict[str, Any]) -> Dict[str, float]:
+    """Compare two HTML elements and return similarity scores."""
+    from difflib import SequenceMatcher
+    
+    # Structure score (40%)
+    structure_score = (
+        (suggested["tag_name"] == target["tag_name"]) * 0.5 +
+        (suggested["parent_tag"] == target["parent_tag"]) * 0.3 +
+        len(set(suggested["siblings"]) & set(target["siblings"])) / 
+        max(len(target["siblings"]), 1) * 0.2
+    )
+    
+    # Attributes score (30%)
+    common_attrs = set(suggested["attributes"]) & set(target["attributes"])
+    matching_attrs = sum(
+        suggested["attributes"][attr] == target["attributes"][attr]
+        for attr in common_attrs
+    )
+    attrs_score = matching_attrs / max(len(target["attributes"]), 1)
+    
+    # Content similarity score (30%)
+    content_score = SequenceMatcher(
+        None,
+        suggested["inner_html"],
+        target["inner_html"]
+    ).ratio()
+    
+    return {
+        "structure_score": structure_score,
+        "attributes_score": attrs_score,
+        "content_score": content_score,
+        "total_score": (
+            structure_score * 0.4 +
+            attrs_score * 0.3 +
+            content_score * 0.3
+        )
+    }

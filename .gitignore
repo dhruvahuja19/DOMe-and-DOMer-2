@@ -32,8 +32,6 @@ ENV/
 *.swo
 
 # Benchmark specific
-results/
-data/ground_truth/*.png
 *.log
 
 # Environment variables

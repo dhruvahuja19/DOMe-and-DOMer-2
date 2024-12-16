@@ -1,8 +1,8 @@
-selenium>=4.15.2
-webdriver-manager>=4.0.1
-Pillow>=10.1.0  # For image processing
-numpy==1.24.3   # For image comparison
-requests==2.31.0
-beautifulsoup4==4.12.2
-openai==1.3.7   # For GPT-4V evaluation
-python-dotenv==1.0.0  # For environment variables
+selenium
+webdriver-manager
+Pillow
+numpy
+requests
+beautifulsoup4
+openai
+python-dotenv

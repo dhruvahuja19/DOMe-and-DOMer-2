@@ -16,10 +16,11 @@ def get_accessibility_tree(driver: webdriver.Chrome, save_file: Optional[str] = 
     """Get accessibility tree of the current page"""
     js_script = """
         function getAccessibilityTree(node, tree = {}) {
-            tree.role = node.role;
-            tree.name = node.name;
-            tree.type = node.type;
-            if (node.value) tree.value = node.value;
+            tree.role = node.role || '';
+            tree.name = node.tagName || '';
+            tree.type = node.type || '';
+            tree.value = node.value || '';
+            tree.textContent = node.textContent ? node.textContent.trim() : '';
             
             const rect = node.getBoundingClientRect();
             tree.location = {
@@ -30,8 +31,9 @@ def get_accessibility_tree(driver: webdriver.Chrome, save_file: Optional[str] = 
             };
             
             tree.children = [];
-            for (let child of node.children) {
-                tree.children.push(getAccessibilityTree(child));
+            const children = node.children;
+            for (let i = 0; i < children.length; i++) {
+                tree.children.push(getAccessibilityTree(children[i]));
             }
             return tree;
         }
@@ -93,20 +95,21 @@ class WebInteractionUtils:
 
 def compute_image_similarity(img1_path: str, img2_path: str) -> float:
     """Compute similarity between two images"""
-    def load_and_process(path):
-        img = Image.open(path).convert('RGB')
-        img = img.resize((224, 224))  # Standard size
-        return np.array(img)
+    img1 = np.array(Image.open(img1_path))
+    img2 = np.array(Image.open(img2_path))
     
-    img1 = load_and_process(img1_path)
-    img2 = load_and_process(img2_path)
+    # Ensure same size
+    if img1.shape != img2.shape:
+        img2 = np.array(Image.open(img2_path).resize((img1.shape[1], img1.shape[0])))
     
     # Compute MSE
     mse = np.mean((img1 - img2) ** 2)
-    # Convert to similarity score (1 = identical, 0 = completely different)
+    
+    # Convert to similarity score (0 to 1)
     similarity = 1 / (1 + mse)
     
-    return similarity
+    # Convert numpy float to Python float
+    return float(similarity)
 
 def load_tasks(tasks_file: str) -> List[Dict[str, Any]]:
     """Load tasks from JSONL file"""
@@ -119,5 +122,18 @@ def load_tasks(tasks_file: str) -> List[Dict[str, Any]]:
 
 def save_results(results: List[Dict[str, Any]], output_file: str) -> None:
     """Save benchmark results to JSON file"""
+    # Convert any numpy types to Python types
+    serializable_results = []
+    for result in results:
+        serializable_result = {}
+        for key, value in result.items():
+            if isinstance(value, np.floating):
+                serializable_result[key] = float(value)
+            elif isinstance(value, np.integer):
+                serializable_result[key] = int(value)
+            else:
+                serializable_result[key] = value
+        serializable_results.append(serializable_result)
+    
     with open(output_file, 'w') as f:
-        json.dump(results, f, indent=2)
+        json.dump(serializable_results, f, indent=2)

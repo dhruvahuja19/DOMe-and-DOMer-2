@@ -9,7 +9,7 @@ from typing import List, Dict, Any
 from openai import OpenAI
 from dotenv import load_dotenv
 
-SYSTEM_PROMPT = """As an evaluator for DOM and DOMer-2 benchmark, you will assess web element interactions based on:
+SYSTEM_PROMPT = """As an evaluator for DOM and DOMer-2 benchmark, you will assess web element interactions based on visual comparison:
 
 1. Task Description: A specific web interaction task (e.g., "Click the search button", "Type text in input field")
 
@@ -18,28 +18,18 @@ SYSTEM_PROMPT = """As an evaluator for DOM and DOMer-2 benchmark, you will asses
    - After: Actual result after interaction
    - Ground Truth: Expected result for successful interaction
    - Expected Visual Changes: List of specific visual changes to verify
-   
-3. Accessibility Validation:
-   - Accessibility Tree: JSON representation of webpage's accessibility state
-   - Expected Accessibility Changes: List of specific accessibility changes to verify
-
-4. Success Criteria:
-   - Specific conditions that must be met for success
-   - Visual state matches ground truth
-   - Accessibility state reflects expected changes
 
 Your evaluation should:
-1. Compare before/after/ground-truth screenshots
+1. Compare the after screenshot with the ground truth screenshot
 2. Verify all listed visual changes occurred
-3. Validate accessibility tree changes
-4. Check all success criteria are met
+3. Pay special attention to the relevant regions where changes should occur
 
 Provide your evaluation as:
-1. 'SUCCESS' or 'NOT SUCCESS'
-2. Detailed explanation of:
+1. A score from 0-100 based on visual similarity and completion of expected changes
+2. 'SUCCESS' if score ≥ 90, otherwise 'NOT SUCCESS'
+3. Brief explanation of:
    - Visual changes observed/missing
-   - Accessibility changes verified/missing
-   - Success criteria met/failed"""
+   - Why the interaction succeeded or failed"""
 
 def encode_image(image_path: str) -> str:
     """Encode image as base64 string"""
@@ -49,101 +39,70 @@ def encode_image(image_path: str) -> str:
 def evaluate_task(
     task: Dict[str, Any],
     result: Dict[str, Any],
-    output_dir: Path,
-    ground_truth_dir: Path,
+    ground_truth: Dict[str, Any],
     openai_client: OpenAI
 ) -> Dict[str, Any]:
-    """Evaluate a single task using GPT-4V"""
+    """Evaluate a single task using GPT-4V based on visual comparison"""
     
-    # Get screenshots
-    before_img = encode_image(str(output_dir / f"before_{task['id']}.png"))
-    after_img = encode_image(str(output_dir / f"after_{task['id']}.png"))
-    ground_truth_img = encode_image(str(ground_truth_dir / task['ground_truth']['screenshot']))
-    
-    # Get accessibility tree if available
-    tree_path = output_dir / f"accessibility_tree_{task['id']}.json"
-    accessibility_tree = None
-    if tree_path.exists():
-        with open(tree_path) as f:
-            accessibility_tree = json.load(f)
-    
-    # Format prompt with enhanced ground truth information
     messages = [
-        {
-            "role": "system",
-            "content": SYSTEM_PROMPT
-        },
-        {
-            "role": "user",
-            "content": [
-                {
-                    "type": "text",
-                    "text": f"""Task: {task['task']}
-Website: {task['web_name']}
-Interaction: {task['interaction']}
-Element Type: {task['element_type']}
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": f"""
+Task: {task['task']}
 
-Ground Truth Information:
-1. Description: {task['ground_truth']['description']}
-2. Expected Visual Changes:
-{chr(10).join(f'   - {change}' for change in task['ground_truth'].get('visual_changes', []))}
-3. Expected Accessibility Changes:
-{chr(10).join(f'   - {change}' for change in task['ground_truth'].get('accessibility_changes', []))}
-4. Success Criteria:
-{chr(10).join(f'   - {criterion}' for criterion in task['ground_truth'].get('success_criteria', []))}
-
-Accessibility Tree:
-{json.dumps(accessibility_tree, indent=2) if accessibility_tree else 'Not available'}
-
-Please evaluate the interaction by comparing:
+Please compare:
 1. Before screenshot (initial state)
 2. After screenshot (actual result)
-3. Ground Truth screenshot (expected result)"""
-                },
-                {
-                    "type": "text",
-                    "text": "Before interaction:"
-                },
-                {
-                    "type": "image_url",
-                    "image_url": {"url": f"data:image/png;base64,{before_img}"}
-                },
-                {
-                    "type": "text",
-                    "text": "After interaction:"
-                },
-                {
-                    "type": "image_url",
-                    "image_url": {"url": f"data:image/png;base64,{after_img}"}
-                },
-                {
-                    "type": "text",
-                    "text": "Ground Truth:"
-                },
-                {
-                    "type": "image_url",
-                    "image_url": {"url": f"data:image/png;base64,{ground_truth_img}"}
-                }
-            ]
-        }
+3. Ground truth screenshot (expected result)
+
+Expected visual changes:
+{json.dumps(ground_truth['visual_changes'], indent=2)}
+
+Provide:
+1. Similarity score (0-100)
+2. Success status
+3. Brief explanation"""},
+        {"role": "assistant", "content": "I'll examine the screenshots and evaluate based on visual similarity and expected changes."},
+        {"role": "user", "content": [
+            {"type": "text", "text": "Before interaction:"},
+            {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{encode_image(result['before_screenshot'])}"}},
+            {"type": "text", "text": "After interaction:"},
+            {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{encode_image(result['after_screenshot'])}"}},
+            {"type": "text", "text": "Ground Truth:"},
+            {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{encode_image(ground_truth['screenshot'])}"}},
+        ]}
     ]
-    
-    # Get GPT-4V evaluation
-    response = openai_client.chat.completions.create(
-        model="gpt-4-vision-preview",
-        messages=messages,
-        max_tokens=1000
-    )
-    
-    evaluation = response.choices[0].message.content
-    success = "SUCCESS" in evaluation.upper()
-    
-    return {
-        "task_id": task["id"],
-        "success": success,
-        "evaluation": evaluation,
-        "timestamp": int(time.time())
-    }
+
+    try:
+        response = openai_client.chat.completions.create(
+            model="gpt-4-vision-preview",
+            messages=messages,
+            max_tokens=1000,
+            temperature=0
+        )
+        
+        evaluation = response.choices[0].message.content
+        
+        # Extract score and success status
+        import re
+        score_match = re.search(r'(\d+)(?=/100|%)', evaluation)
+        score = int(score_match.group(1)) if score_match else 0
+        
+        return {
+            "task_id": task["id"],
+            "score": score,
+            "success": score >= 90,
+            "evaluation": evaluation,
+            "timestamp": int(time.time())
+        }
+        
+    except Exception as e:
+        return {
+            "task_id": task["id"],
+            "score": 0,
+            "success": False,
+            "evaluation": f"Evaluation failed: {str(e)}",
+            "timestamp": int(time.time())
+        }
 
 def run_evaluation(
     tasks_file: Path,
@@ -174,7 +133,6 @@ def run_evaluation(
             evaluation = evaluate_task(
                 task,
                 task_result,
-                results_dir,
                 ground_truth_dir,
                 openai_client
             )

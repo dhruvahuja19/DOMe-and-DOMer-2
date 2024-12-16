@@ -36,7 +36,7 @@ def compare_images(prompt, ground_truth_path, agent_image_path, note = None):
     if note:
         user_prompt += f"Here are some notes to help you evaluate the images: {note}"
     response = client.chat.completions.create(
-        model="gpt-4o",
+        model="gpt-4-vision-preview",
         temperature=0,
         messages=[
             {"role": "system", "content": system_prompt},
@@ -64,4 +64,3 @@ def compare_images(prompt, ground_truth_path, agent_image_path, note = None):
     print (f"[DEBUG] Response from the image comparison: {response.choices[0].message.content}")
     print (f"[DEBUG] Image Correctness: {response.choices[0].message.content.lower().strip() == 'true'}")
     return "true" in response.choices[0].message.content.lower().strip(), response.choices[0].message.content
-

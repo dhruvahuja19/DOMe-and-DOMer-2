@@ -1,1 +1,27 @@
-{"web_name": "Cambridge Dictionary", "id": "cambridge_lookup_1", "task": "Click the search box and type 'hello'", "web": "https://dictionary.cambridge.org/", "element_type": "input", "interaction": "type", "target_element": {"type": "id", "value": "searchword"}, "input_text": "hello", "ground_truth": {"screenshot": "cambridge_lookup_1_gt.png", "description": "The word 'hello' has been entered in the search box", "visual_changes": ["Text 'hello' appears in search box", "Text cursor visible at end of input", "Search suggestions may appear"], "accessibility_changes": ["Search box aria-value updates to 'hello'", "Search suggestions list may become visible"], "success_criteria": ["Input text matches 'hello' exactly", "Text is visible in search box", "Search box maintains focus"]}}
+{
+    "web_name": "Cambridge Dictionary",
+    "id": "cambridge_lookup_1",
+    "task": "Click the search box and type 'hello'",
+    "web": "https://dictionary.cambridge.org/",
+    "element_type": "input",
+    "interaction": "type",
+    "target_element": {
+        "type": "id",
+        "value": "searchword"
+    },
+    "input_text": "hello",
+    "ground_truth": {
+        "screenshot": "cambridge_lookup_1_gt.png",
+        "description": "The word 'hello' has been entered in the search box",
+        "visual_changes": [
+            "Text 'hello' appears in search box",
+            "Text cursor visible at end of input",
+            "Search suggestions may appear"
+        ],
+        "success_criteria": [
+            "Input text matches 'hello' exactly",
+            "Text is visible in search box",
+            "Search box maintains focus"
+        ]
+    }
+}

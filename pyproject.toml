@@ -1,0 +1,63 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dom-and-domer-2"
+version = "0.1.0"
+description = "A benchmark for evaluating language models' ability to execute web element interactions"
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+keywords = ["benchmark", "dom", "web-interaction", "language-models"]
+authors = [
+    { name = "Dhruv Ahuja" }
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = [
+    "selenium==4.15.2",
+    "webdriver-manager==4.0.1",
+    "Pillow==10.1.0",
+    "numpy==1.24.3",
+    "requests==2.31.0",
+    "beautifulsoup4==4.12.2",
+    "openai==1.3.7",
+    "python-dotenv==1.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/DOM-and-DOMer-2"
+Repository = "https://github.com/yourusername/DOM-and-DOMer-2.git"
+
+[tool.black]
+line-length = 88
+target-version = ["py38"]
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests",
+]

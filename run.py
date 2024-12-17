@@ -6,6 +6,7 @@ from serial_runner import run_serial_benchmark
 from evaluation.auto_eval import run_evaluation
 from models import GPT4Model, ClaudeModel, GeminiModel
 import os
+from dotenv import load_dotenv
 
 def get_model(model_name):
     """Get the appropriate model based on command line argument."""
@@ -13,8 +14,8 @@ def get_model(model_name):
     
     models = {
         'gpt4': lambda: GPT4Model(api_key=os.getenv("OPENAI_API_KEY")),
-        'claude': lambda: ClaudeModel(api_key=os.getenv("ANTHROPIC_API_KEY")),
-        'gemini': lambda: GeminiModel(api_key=os.getenv("GOOGLE_API_KEY"))
+        'claude': lambda: ClaudeModel(api_key=os.getenv("ANTHROPIC_API_KEY"), model_config={}),
+        'gemini': lambda: GeminiModel(api_key=os.getenv("GOOGLE_API_KEY"), model_config={})
     }
     
     if model_name not in models:
@@ -49,23 +50,19 @@ def main():
     if args.mode == 'parallel':
         results = run_parallel_benchmark(
             tasks_file=args.tasks,
-            output_dir=args.output,
-            model=model,
+            output_dir=str(output_dir),
             max_workers=args.max_workers,
             save_accessibility_tree=args.save_accessibility_tree,
             wait_time=args.wait_time,
-            evaluate=args.evaluate,
-            evaluate_mode=args.evaluate_mode
+            model=model
         )
     else:
         results = run_serial_benchmark(
             tasks_file=args.tasks,
-            output_dir=args.output,
-            model=model,
+            output_dir=str(output_dir),
             save_accessibility_tree=args.save_accessibility_tree,
             wait_time=args.wait_time,
-            evaluate=args.evaluate,
-            evaluate_mode=args.evaluate_mode
+            model=model
         )
     
     # Save results
@@ -75,14 +72,48 @@ def main():
     
     # Run evaluation if requested
     if args.evaluate:
-        eval_output = output_dir / "evaluation.json"
-        run_evaluation(
+        # Run evaluations
+        eval_results = run_evaluation(
             tasks_file=Path(args.tasks),
             results_dir=results_file,
-            output_file=eval_output,
+            output_file=None,  # Don't save to separate file
             openai_key=os.getenv('OPENAI_API_KEY'),
             max_workers=args.max_workers if args.evaluate_mode == 'parallel' else None
         )
+        
+        # Update results with evaluations
+        for result in results:
+            task_id = result['task_id']
+            eval_result = next((e for e in eval_results['evaluations'] if e['task_id'] == task_id), None)
+            if eval_result:
+                # Get evaluation scores and explanations, with defaults if missing
+                visual_score = eval_result.get('visual_score', 0.0)
+                html_score = eval_result.get('html_score', 0.0)
+                final_score = eval_result.get('final_score', 0.0)  # Get final score from evaluation
+                visual_reasoning = eval_result.get('visual_reasoning', 'No visual evaluation available')
+                html_reasoning = eval_result.get('html_reasoning', 'No HTML evaluation available')
+                
+                # Add evaluation scores to result
+                result['final_score'] = final_score  # Add final score at top level
+                result['llm_evaluations'] = {
+                    'image_similarity': {
+                        'score': visual_score,
+                        'explanation': visual_reasoning
+                    },
+                    'html_fuzzy_match': {
+                        'score': html_score,
+                        'explanation': html_reasoning
+                    }
+                }
+                # Update success based on evaluation scores
+                # Only mark as success if both image and HTML evaluations pass
+                result['success'] = (visual_score > 0.5 and html_score > 0.5)
+                if not result['success'] and not result['error']:
+                    result['error'] = "Failed evaluation checks"
+        
+        # Save updated results
+        with open(results_file, 'w') as f:
+            json.dump(results, f, indent=2)
 
 if __name__ == '__main__':
     main()

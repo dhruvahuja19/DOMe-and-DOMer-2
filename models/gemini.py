@@ -110,10 +110,7 @@ Generate the optimal web interaction instruction as a JSON object."""
                     selector_type=interaction_data.get('selector_type', task['target_element']['type']),
                     selector_value=interaction_data.get('selector_value', task['target_element']['value']),
                     input_text=interaction_data.get('input_text'),
-                    description=task['task'],
-                    wait_time=interaction_data.get('wait_time', 0),
-                    hover_duration=interaction_data.get('hover_duration', 0),
-                    validation=interaction_data.get('validation', {})
+                    description=task['task']
                 )
         except Exception as e:
             print(f"Error parsing Gemini response: {str(e)}")
@@ -167,10 +164,7 @@ Generate a modified interaction as a JSON object or respond with "GIVE UP" if un
                     selector_type=interaction_data['selector_type'],
                     selector_value=interaction_data['selector_value'],
                     input_text=interaction_data.get('input_text'),
-                    description=f"Error recovery: {task['task']}",
-                    wait_time=interaction_data.get('wait_time', 0),
-                    hover_duration=interaction_data.get('hover_duration', 0),
-                    validation=interaction_data.get('validation', {})
+                    description=f"Error recovery: {task['task']}"
                 )
         except Exception as e:
             print(f"Error in error handling: {str(e)}")

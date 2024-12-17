@@ -35,6 +35,22 @@ def fuzzy_match_html(
     
     client = openai_client
     
+    # Truncate inputs if too long
+    max_html_length = 2000  # Characters per HTML string
+    max_task_length = 500   # Characters for task description
+    
+    if len(actual_html) > max_html_length:
+        actual_html = actual_html[:max_html_length] + "..."
+        logger.warning("Actual HTML was truncated due to length")
+        
+    if len(expected_html) > max_html_length:
+        expected_html = expected_html[:max_html_length] + "..."
+        logger.warning("Expected HTML was truncated due to length")
+        
+    if len(task_description) > max_task_length:
+        task_description = task_description[:max_task_length] + "..."
+        logger.warning("Task description was truncated due to length")
+    
     user_prompt = f"""You are evaluating if an HTML element matches the expected element for the following task: {task_description}
 
 Expected HTML: {expected_html}

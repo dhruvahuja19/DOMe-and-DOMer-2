@@ -15,25 +15,33 @@ def execute_interaction(driver: webdriver.Chrome, interaction: Dict[str, Any]) -
     """Execute a single interaction on the webpage and return success status and element HTML"""
     try:
         action = interaction.get("action", "").lower()
-        selector = interaction.get("selector", "")
-        value = interaction.get("value", "")
         
-        if not selector:
-            logging.warning("No selector provided for interaction")
+        # Get selector info from either old or new format
+        selector_type = None
+        selector_value = None
+        
+        # Try new format first (target_element)
+        target_element = interaction.get("target_element")
+        if target_element:
+            selector_type = target_element.get("type")
+            selector_value = target_element.get("value")
+        
+        # Fall back to old format if needed
+        if not selector_type or not selector_value:
+            selector = interaction.get("selector")
+            if selector:
+                selector_parts = selector.split('=', 1)
+                if len(selector_parts) == 2:
+                    selector_type, selector_value = selector_parts
+        
+        if not selector_type or not selector_value:
+            logging.warning("No valid selector found in interaction")
             return False, None
             
-        # Parse selector in format "type=value"
-        selector_parts = selector.split('=', 1)
-        if len(selector_parts) != 2:
-            logging.error(f"Invalid selector format: {selector}")
-            return False, None
-            
-        selector_type, selector_value = selector_parts
-        
         # Map selector type to Selenium By
         selector_map = {
             'id': By.ID,
-            'class': By.CLASS_NAME,
+            'class': By.CSS_SELECTOR,
             'css': By.CSS_SELECTOR,
             'xpath': By.XPATH,
             'name': By.NAME,
@@ -44,14 +52,25 @@ def execute_interaction(driver: webdriver.Chrome, interaction: Dict[str, Any]) -
         if not by_type:
             logging.error(f"Unsupported selector type: {selector_type}")
             return False, None
-        
+            
+        # For class selectors, convert to CSS format
+        selector_value_to_use = selector_value
+        if selector_type.lower() == 'class':
+            # Handle space-separated class names by converting to CSS format
+            classes = selector_value.split()
+            selector_value_to_use = '.' + '.'.join(classes)
+            logging.info(f"Converted class selector '{selector_value}' to CSS selector '{selector_value_to_use}'")
+            
         # Wait for element to be present and interactable
-        wait = WebDriverWait(driver, 10)
-        element = wait.until(EC.presence_of_element_located((by_type, selector_value)))
-        wait.until(EC.element_to_be_clickable((by_type, selector_value)))
+        wait = WebDriverWait(driver, 30)
+        element = wait.until(EC.presence_of_element_located((by_type, selector_value_to_use)))
+        wait.until(EC.element_to_be_clickable((by_type, selector_value_to_use)))
         
         # Get element's outer HTML
         element_html = element.get_attribute('outerHTML')
+        
+        # Prioritize input_text over value
+        value = interaction.get("input_text", interaction.get("value", ""))
         
         # Execute the interaction
         if action == "click":
@@ -66,22 +85,24 @@ def execute_interaction(driver: webdriver.Chrome, interaction: Dict[str, Any]) -
             logging.error(f"Unsupported action: {action}")
             return False, element_html
             
+        logging.info(f"Successfully executed {action} on {selector_type}={selector_value} with value '{value}'")
         return True, element_html
         
     except Exception as e:
         logging.error(f"Error executing interaction: {str(e)}")
         return False, None
 
-def save_screenshot(driver: webdriver.Chrome, filepath: str) -> bool:
+def save_screenshot(driver: webdriver.Chrome, filepath: Union[str, Path]) -> Optional[str]:
     """Save screenshot of the current page state"""
     try:
-        Path(filepath).parent.mkdir(parents=True, exist_ok=True)
-        driver.save_screenshot(filepath)
+        filepath = Path(filepath)
+        filepath.parent.mkdir(parents=True, exist_ok=True)
+        driver.save_screenshot(str(filepath))
         logging.info(f"Screenshot saved to {filepath}")
-        return True
+        return str(filepath)
     except Exception as e:
         logging.error(f"Error saving screenshot: {str(e)}")
-        return False
+        return None
 
 def get_accessibility_tree(driver: webdriver.Chrome) -> Dict[str, Any]:
     """Get accessibility tree of the current page"""

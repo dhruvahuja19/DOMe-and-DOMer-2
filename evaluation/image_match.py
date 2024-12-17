@@ -21,7 +21,11 @@ Reason: [Reason for the correctness/incorrectness of the agent's output]
 
 def encode_image(image_path):
     with open(image_path, "rb") as image_file:
-        return base64.b64encode(image_file.read()).decode('utf-8')
+        image_data = image_file.read()
+        # Check file size (max 20MB)
+        if len(image_data) > 20 * 1024 * 1024:
+            raise ValueError(f"Image {image_path} is too large (>20MB)")
+        return base64.b64encode(image_data).decode('utf-8')
 
 def compare_images(prompt, ground_truth_path, agent_image_path, note = None, openai_client = None):
     if openai_client is None:
@@ -42,17 +46,40 @@ def compare_images(prompt, ground_truth_path, agent_image_path, note = None, ope
     logger.debug("Using provided OpenAI client")
     client = openai_client
 
-    image1 = encode_image(ground_truth_path)
-    image2 = encode_image(agent_image_path)
+    try:
+        image1 = encode_image(ground_truth_path)
+        image2 = encode_image(agent_image_path)
+    except ValueError as e:
+        logger.error(f"Image encoding error: {str(e)}")
+        return False, f"Image processing error: {str(e)}"
+        
+    # Truncate prompt if too long
+    max_prompt_length = 500
+    if len(prompt) > max_prompt_length:
+        prompt = prompt[:max_prompt_length] + "..."
+        
     user_prompt = f"The agent was trying to accomplish the following task: {prompt} The first image is the expected image and the second image is the agent's output. Does the image answer the question correctly as the expected image? Don't focus on unnecessary details, like axes titles or colors or image size or labels unless specified in the task."
     if note:
+        # Truncate note if too long
+        if len(note) > 200:
+            note = note[:200] + "..."
         user_prompt += f"Here are some notes to help you evaluate the images: {note}"
     messages = [
-        {"role": "system", "content": system_prompt},
+        {
+            "role": "system",
+            "content": """You are evaluating if a web automation task was completed successfully. Compare the screenshots and determine if the task's goal was achieved, focusing on the relevant UI changes that indicate success.
+
+Return a JSON object with:
+- correctness (boolean): Whether the task was completed successfully
+- reason (string): Clear explanation of your evaluation"""
+        },
         {
             "role": "user",
             "content": [
-                {"type": "text", "text": user_prompt},
+                {
+                    "type": "text",
+                    "text": user_prompt
+                },
                 {
                     "type": "image_url",
                     "image_url": {"url": f"data:image/jpeg;base64,{image1}"}

@@ -13,7 +13,7 @@ def run_serial_evaluation(
     results_dir: Path,
     output_file: Path,
     openai_key: str
-) -> None:
+) -> Dict[str, Any]:
     """Run evaluation on task results serially"""
     # Initialize OpenAI client
     client = OpenAI(api_key=openai_key)
@@ -59,7 +59,7 @@ def run_serial_evaluation(
                     "success": result["success"],
                     "visual_score": visual_score,
                     "html_score": html_score,
-                    "final_score": (visual_score + html_score) / 2,
+                    "final_score": (0.8 * visual_score + 0.2 * html_score),
                     "visual_reasoning": visual_reasoning,
                     "html_reasoning": html_reasoning
                 }
@@ -76,13 +76,18 @@ def run_serial_evaluation(
                     "error": str(e)
                 })
     
-    # Save evaluations to output file
-    with output_file.open('w') as f:
-        json.dump({
-            "total_tasks": len(tasks),
-            "successful_tasks": sum(1 for e in evaluations if e.get("success", False)),
-            "evaluations": evaluations
-        }, f, indent=2)
+    evaluation_results = {
+        "total_tasks": len(tasks),
+        "successful_tasks": sum(1 for e in evaluations if e.get("success", False)),
+        "evaluations": evaluations
+    }
+    
+    # Save evaluations if output file is provided
+    if output_file:
+        with output_file.open('w') as f:
+            json.dump(evaluation_results, f, indent=2)
+            
+    return evaluation_results
 
 def run_evaluation(
     tasks_file: Path,
@@ -90,9 +95,9 @@ def run_evaluation(
     output_file: Path,
     openai_key: str,
     max_workers: int = None
-) -> None:
+) -> Dict[str, Any]:
     """Run evaluation on task results using either serial or parallel mode"""
     if max_workers:
-        run_parallel_evaluation(tasks_file, results_dir, output_file, openai_key, max_workers)
+        return run_parallel_evaluation(tasks_file, results_dir, output_file, openai_key, max_workers)
     else:
-        run_serial_evaluation(tasks_file, results_dir, output_file, openai_key)
+        return run_serial_evaluation(tasks_file, results_dir, output_file, openai_key)

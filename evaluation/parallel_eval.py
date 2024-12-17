@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Dict, Any, List, Tuple
 from openai import OpenAI
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import time
 
 from evaluation.image_match import compare_images
 from evaluation.fuzzy_match import fuzzy_match_html
@@ -32,16 +33,19 @@ def evaluate_task(task: Dict[str, Any], result: Dict[str, Any], client: OpenAI) 
         visual_score = 1.0 if visual_correctness else 0.0
         html_score = 1.0 if html_correctness else 0.0
 
+        # Calculate final score: 80% visual, 20% HTML
+        final_score = (0.8 * visual_score) + (0.2 * html_score)
+
         evaluation = {
             "task_id": task_id,
             "success": result["success"],
             "visual_score": visual_score,
             "html_score": html_score,
-            "final_score": (visual_score + html_score) / 2,
+            "final_score": final_score,
             "visual_reasoning": visual_reasoning,
             "html_reasoning": html_reasoning
         }
-        logging.info(f"Evaluated task {task_id}: score={evaluation.get('final_score', 0.0):.2f}")
+        logging.info(f"Evaluated task {task_id}: score={final_score:.2f}")
         return evaluation
     except Exception as e:
         logging.error(f"Error evaluating task {task_id}: {str(e)}")
@@ -60,7 +64,7 @@ def run_parallel_evaluation(
     output_file: Path,
     openai_key: str,
     max_workers: int = 4
-) -> None:
+) -> Dict[str, Any]:
     """Run evaluation on task results in parallel"""
     # Initialize OpenAI client
     client = OpenAI(api_key=openai_key)
@@ -84,33 +88,50 @@ def run_parallel_evaluation(
         if result:
             task_pairs.append((task, result))
     
-    # Run evaluations in parallel
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        future_to_task = {
-            executor.submit(evaluate_task, task, result, client): task_id
-            for task, result in task_pairs
-        }
+    # Process tasks in smaller batches to avoid rate limits
+    batch_size = min(max_workers, 3)  # Process at most 3 tasks at a time
+    for i in range(0, len(task_pairs), batch_size):
+        batch = task_pairs[i:i + batch_size]
+        logging.info(f"Processing evaluation batch {i//batch_size + 1}/{(len(task_pairs) + batch_size - 1)//batch_size}")
         
-        for future in as_completed(future_to_task):
-            try:
-                evaluation = future.result()
-                evaluations.append(evaluation)
-            except Exception as e:
-                task_id = future_to_task[future]
-                logging.error(f"Error in evaluation future for task {task_id}: {str(e)}")
-                evaluations.append({
-                    "task_id": task_id,
-                    "success": False,
-                    "visual_score": 0.0,
-                    "html_score": 0.0,
-                    "final_score": 0.0,
-                    "error": str(e)
-                })
+        # Run evaluations in parallel for this batch
+        with ThreadPoolExecutor(max_workers=batch_size) as executor:
+            future_to_task = {
+                executor.submit(evaluate_task, task, result, client): task['id']
+                for task, result in batch
+            }
+            
+            for future in as_completed(future_to_task):
+                try:
+                    evaluation = future.result(timeout=60)  # 60 second timeout per evaluation
+                    evaluations.append(evaluation)
+                    logging.info(f"Completed evaluation for task {future_to_task[future]}")
+                except Exception as e:
+                    task_id = future_to_task[future]
+                    error_msg = f"Error in evaluation future for task {task_id}: {str(e)}"
+                    logging.error(error_msg)
+                    evaluations.append({
+                        "task_id": task_id,
+                        "success": False,
+                        "visual_score": 0.0,
+                        "html_score": 0.0,
+                        "final_score": 0.0,
+                        "error": error_msg
+                    })
+        
+        # Add a small delay between batches to avoid rate limits
+        if i + batch_size < len(task_pairs):
+            time.sleep(1)
     
-    # Save evaluations to output file
-    with output_file.open('w') as f:
-        json.dump({
-            "total_tasks": len(tasks),
-            "successful_tasks": sum(1 for e in evaluations if e.get("success", False)),
-            "evaluations": evaluations
-        }, f, indent=2)
+    evaluation_results = {
+        "total_tasks": len(tasks),
+        "successful_tasks": sum(1 for e in evaluations if e.get("success", False)),
+        "evaluations": evaluations
+    }
+    
+    # Save evaluations if output file is provided
+    if output_file:
+        with output_file.open('w') as f:
+            json.dump(evaluation_results, f, indent=2)
+            
+    return evaluation_results

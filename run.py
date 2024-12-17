@@ -16,6 +16,8 @@ def main():
     parser.add_argument('--save-accessibility-tree', action='store_true', help='Save accessibility trees for each task')
     parser.add_argument('--wait-time', type=float, default=2.0, help='Wait time between actions in seconds')
     parser.add_argument('--evaluate', action='store_true', help='Run evaluation after benchmark')
+    parser.add_argument('--evaluate-mode', type=str, choices=['serial', 'parallel'], default='parallel',
+                       help='Run evaluations serially or in parallel')
     
     args = parser.parse_args()
     
@@ -52,7 +54,8 @@ def main():
             tasks_file=Path(args.tasks),
             results_dir=results_file,
             output_file=eval_output,
-            openai_key=os.getenv('OPENAI_API_KEY')
+            openai_key=os.getenv('OPENAI_API_KEY'),
+            max_workers=args.max_workers if args.evaluate_mode == 'parallel' else None
         )
 
 if __name__ == '__main__':

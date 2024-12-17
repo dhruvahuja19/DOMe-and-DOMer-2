@@ -9,6 +9,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.webdriver.common.action_chains import ActionChains
 
 def execute_interaction(driver: webdriver.Chrome, interaction: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
     """Execute a single interaction on the webpage and return success status and element HTML"""
@@ -58,6 +59,9 @@ def execute_interaction(driver: webdriver.Chrome, interaction: Dict[str, Any]) -
         elif action == "type":
             element.clear()
             element.send_keys(value)
+        elif action == "hover":
+            actions = ActionChains(driver)
+            actions.move_to_element(element).perform()
         else:
             logging.error(f"Unsupported action: {action}")
             return False, element_html

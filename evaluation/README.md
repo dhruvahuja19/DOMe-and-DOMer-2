@@ -19,12 +19,37 @@ evaluation/
 └── fuzzy_match.py      # HTML element comparison
 ```
 
-## Environment Setup
+## HTML Element Validation
 
-1. Ensure you have the OpenAI API key in your `.env` file:
-```bash
-OPENAI_API_KEY=your_openai_api_key
-```
+The system compares the HTML element that was actually interacted with against the expected element defined in the task:
+
+1. **Expected HTML**: Defined in task file under `target_html`
+   ```json
+   {
+     "target_html": "<input id='searchword' type='text' ...>"
+   }
+   ```
+
+2. **Actual HTML**: Captured during interaction using `element.get_attribute('outerHTML')`
+   - Stored in results as `html_element`
+   - Includes all runtime attributes and state
+
+3. **Comparison Criteria**:
+   - Element type (tag name)
+   - Key attributes (id, class, etc.)
+   - Content and inner HTML
+   - Role and accessibility attributes
+
+4. **Fuzzy Matching**:
+   - Uses GPT-4 to understand semantic equivalence
+   - Tolerates dynamic/runtime attributes
+   - Focuses on functional equivalence
+
+## Visual Validation
+
+Uses GPT-4V to compare:
+1. Ground truth screenshot
+2. Actual screenshot after interaction
 
 ## Running Evaluation
 
@@ -41,22 +66,6 @@ python auto_eval.py \
     --output-file data/evaluation.json
 ```
 
-## Evaluation Process
-
-1. **Visual Validation (GPT-4V)**
-   - Compares before/after screenshots with ground truth
-   - Considers task-specific requirements
-   - Returns a score and detailed reasoning
-
-2. **HTML Element Validation**
-   - Compares target HTML with actual interaction
-   - Uses fuzzy matching for robustness
-   - Considers element attributes and structure
-
-The final score is a weighted average:
-- Visual Score: 60%
-- HTML Score: 40%
-
 ## Output Format
 
 ```json
@@ -68,9 +77,10 @@ The final score is a weighted average:
       "task_id": 1,
       "success": true,
       "visual_score": 0.95,
-      "html_score": 0.90,
-      "final_score": 0.93,
-      "reasoning": "..."
+      "html_score": 1.0,
+      "final_score": 0.97,
+      "visual_reasoning": "The search box contains 'hello' as expected...",
+      "html_reasoning": "The input element matches with correct id and attributes..."
     }
   ]
 }

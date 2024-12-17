@@ -42,22 +42,29 @@ Tasks are defined in `data/dom_tasks.jsonl`:
 
 ```json
 {
-    "web_name": "Amazon",
-    "id": "amazon_search_1",
-    "task": "Click the search button",
-    "web": "https://www.amazon.com",
-    "element_type": "button",
-    "interaction": "click",
+    "web_name": "Cambridge Dictionary",
+    "id": "cambridge_lookup_1",
+    "task": "Click the search box and type 'hello'",
+    "web": "https://dictionary.cambridge.org/",
+    "element_type": "input",
+    "interaction": "type",
     "target_element": {
         "type": "id",
-        "value": "nav-search-submit-button"
+        "value": "searchword"
     },
+    "input_text": "hello",
+    "target_html": "<input id='searchword' type='text' ...>",
     "ground_truth": {
-        "screenshot": "amazon_search_1_gt.png",
-        "description": "The search button has been clicked, showing search results"
+        "screenshot": "evaluation/ground_truth/task_1_gt.png",
+        "description": "The word 'hello' has been entered in the search box"
     }
 }
 ```
+
+Key fields:
+- `target_element`: Selector information for finding the element
+- `target_html`: Expected HTML structure of the element
+- `ground_truth`: Reference screenshot and description
 
 ## Ground Truth
 
@@ -85,15 +92,15 @@ OPENAI_API_KEY=your_openai_api_key
 
 ## Running the Benchmark
 
-1. Run tasks:
 ```bash
-python run.py --tasks data/dom_tasks.jsonl --output results --evaluate
+python run.py --tasks data/dom_tasks.jsonl --output data/results --evaluate
 ```
 
 This will:
-- Execute each task in the tasks file
-- Save screenshots and results to the output directory
-- Run GPT-4V evaluation if --evaluate is specified
+1. Execute each task in the tasks file
+2. Save screenshots and results
+3. Compare actual HTML elements with expected ones
+4. Run GPT-4V evaluation on screenshots
 
 ## Ground Truth Management
 

@@ -110,7 +110,9 @@ def main():
                 # Construct and execute interaction
                 interaction = construct_interaction(task)
                 logging.info(f"Executing interaction: {interaction}")
-                success = execute_interaction(driver, interaction)
+                success, element_html = execute_interaction(driver, interaction)
+                result['success'] = success
+                result['html_element'] = element_html
                 time.sleep(args.wait_time)  # Wait for interaction effects
                 
                 # Save after screenshot
@@ -127,7 +129,6 @@ def main():
                     result['after_tree'] = after_tree_path
                     logging.info(f"Saved after accessibility tree: {after_tree_path}")
                 
-                result['success'] = success
                 logging.info(f"Task completed successfully: {success}")
                 
             except Exception as e:

@@ -1,15 +1,39 @@
 import os
+import logging
 from openai import OpenAI
 from typing import Tuple
+from dotenv import load_dotenv
+
+load_dotenv()
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 def fuzzy_match_html(
     task_description: str,
     actual_html: str,
     expected_html: str,
     note: str = None,
+    openai_client: OpenAI = None
 ) -> Tuple[bool, str]:
     """Compare HTML elements using GPT-4 for semantic understanding"""
-    openai = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    
+    if openai_client is None:
+        raise ValueError("OpenAI client must be provided")
+    
+    print("\n=== HTML Task Evaluation ===")
+    print(f"Task Description: {task_description}")
+    print("Agent's HTML Output:")
+    print(actual_html)
+    print("\nExpected HTML:")
+    print(expected_html)
+    if note:
+        print(f"\nAdditional Context: {note}")
+    
+    # Debug logging for API key handling
+    logger.debug("Using provided OpenAI client")
+    
+    client = openai_client
     
     user_prompt = f"""You are evaluating if an HTML element matches the expected element for the following task: {task_description}
 
@@ -44,13 +68,21 @@ Respond True if:
         {"role": "user", "content": user_prompt},
     ]
     
-    response = openai.chat.completions.create(
+    response = client.chat.completions.create(
         model="gpt-4",
         messages=messages,
         max_tokens=400,
-        temperature=0.0,
+        temperature=0,
         stream=False
     )
+    
+    print("\n=== Judge's HTML Evaluation ===")
+    print(f"Judge's Response: {response.choices[0].message.content}")
+    print("==============================\n")
+    
+    logger.debug("GPT-4 Response for HTML Comparison:")
+    logger.debug(f"Task: {task_description}")
+    logger.debug(f"Response: {response.choices[0].message.content}")
     
     content = response.choices[0].message.content
     is_match = "true" in content.lower().strip()

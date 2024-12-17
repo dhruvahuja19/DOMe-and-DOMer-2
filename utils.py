@@ -1,115 +1,151 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+import os
 import json
-import base64
 import time
 import logging
-from typing import Dict, List, Any, Optional
-from PIL import Image
-import numpy as np
+from pathlib import Path
+from typing import Dict, Any, List, Optional, Union
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
-def get_accessibility_tree(driver: webdriver.Chrome, save_file: Optional[str] = None) -> Dict:
-    """Get accessibility tree of the current page"""
-    js_script = """
-        function getAccessibilityTree(node, tree = {}) {
-            tree.role = node.role || '';
-            tree.name = node.tagName || '';
-            tree.type = node.type || '';
-            tree.value = node.value || '';
-            tree.textContent = node.textContent ? node.textContent.trim() : '';
-            
-            const rect = node.getBoundingClientRect();
-            tree.location = {
-                x: rect.x,
-                y: rect.y,
-                width: rect.width,
-                height: rect.height
-            };
-            
-            tree.children = [];
-            const children = node.children;
-            for (let i = 0; i < children.length; i++) {
-                tree.children.push(getAccessibilityTree(children[i]));
-            }
-            return tree;
-        }
-        return getAccessibilityTree(document.documentElement);
-    """
-    tree = driver.execute_script(js_script)
-    
-    if save_file:
-        with open(save_file, 'w') as f:
-            json.dump(tree, f, indent=2)
-    
-    return tree
-
-class WebInteractionUtils:
-    def __init__(self, driver: webdriver.Chrome):
-        self.driver = driver
-        self.wait = WebDriverWait(driver, 10)
+def execute_interaction(driver: webdriver.Chrome, interaction: Dict[str, Any]) -> bool:
+    """Execute a single interaction on the webpage"""
+    try:
+        action = interaction.get("action", "").lower()
+        selector = interaction.get("selector", "")
+        value = interaction.get("value", "")
         
-    def find_element(self, locator_type: str, locator: str) -> Optional[Any]:
-        """Find element with wait and retry logic"""
-        try:
-            element = self.wait.until(
-                EC.presence_of_element_located((getattr(By, locator_type.upper()), locator))
-            )
-            return element
-        except Exception as e:
-            logging.error(f"Failed to find element {locator_type}={locator}: {str(e)}")
-            return None
-    
-    def execute_interaction(self, task: Dict[str, Any]) -> bool:
-        """Execute web interaction based on task definition"""
-        try:
-            # Find element
-            element = self.find_element(
-                task["target_element"].get("type", "XPATH"),
-                task["target_element"].get("value")
-            )
-            if not element:
-                return False
-                
-            # Execute interaction
-            interaction = task["interaction"].lower()
-            if interaction == "click":
-                element.click()
-            elif interaction == "type":
-                element.clear()
-                element.send_keys(task.get("input_text", ""))
-            elif interaction == "hover":
-                ActionChains(self.driver).move_to_element(element).perform()
-            else:
-                logging.error(f"Unknown interaction type: {interaction}")
-                return False
-                
-            return True
-            
-        except Exception as e:
-            logging.error(f"Failed to execute interaction: {str(e)}")
+        if not selector:
+            logging.warning("No selector provided for interaction")
             return False
+            
+        # Parse selector in format "type=value"
+        selector_parts = selector.split('=', 1)
+        if len(selector_parts) != 2:
+            logging.error(f"Invalid selector format: {selector}")
+            return False
+            
+        selector_type, selector_value = selector_parts
+        
+        # Map selector type to Selenium By
+        selector_map = {
+            'id': By.ID,
+            'class': By.CLASS_NAME,
+            'css': By.CSS_SELECTOR,
+            'xpath': By.XPATH,
+            'name': By.NAME,
+            'tag': By.TAG_NAME
+        }
+        
+        by_type = selector_map.get(selector_type.lower())
+        if not by_type:
+            logging.error(f"Unsupported selector type: {selector_type}")
+            return False
+        
+        # Wait for element to be present and interactable
+        wait = WebDriverWait(driver, 10)
+        element = wait.until(EC.presence_of_element_located((by_type, selector_value)))
+        wait.until(EC.element_to_be_clickable((by_type, selector_value)))
+        
+        logging.info(f"Found element using {selector_type}={selector_value}")
+        
+        if action == "click":
+            element.click()
+            logging.info("Clicked element")
+        elif action == "type":
+            element.clear()
+            element.send_keys(value)
+            logging.info(f"Typed '{value}' into element")
+        else:
+            logging.warning(f"Unsupported action: {action}")
+            return False
+            
+        time.sleep(1)  # Allow for any animations/state changes
+        return True
+        
+    except TimeoutException:
+        logging.error(f"Timeout waiting for element: {selector}")
+        return False
+    except NoSuchElementException:
+        logging.error(f"Element not found: {selector}")
+        return False
+    except Exception as e:
+        logging.error(f"Error executing interaction: {str(e)}", exc_info=True)
+        return False
 
-def compute_image_similarity(img1_path: str, img2_path: str) -> float:
-    """Compute similarity between two images"""
-    img1 = np.array(Image.open(img1_path))
-    img2 = np.array(Image.open(img2_path))
-    
-    # Ensure same size
-    if img1.shape != img2.shape:
-        img2 = np.array(Image.open(img2_path).resize((img1.shape[1], img1.shape[0])))
-    
-    # Compute MSE
-    mse = np.mean((img1 - img2) ** 2)
-    
-    # Convert to similarity score (0 to 1)
-    similarity = 1 / (1 + mse)
-    
-    # Convert numpy float to Python float
-    return float(similarity)
+def save_screenshot(driver: webdriver.Chrome, filepath: str) -> bool:
+    """Save screenshot of the current page state"""
+    try:
+        Path(filepath).parent.mkdir(parents=True, exist_ok=True)
+        driver.save_screenshot(filepath)
+        logging.info(f"Screenshot saved to {filepath}")
+        return True
+    except Exception as e:
+        logging.error(f"Error saving screenshot: {str(e)}")
+        return False
+
+def get_accessibility_tree(driver: webdriver.Chrome) -> Dict[str, Any]:
+    """Get accessibility tree of the current page"""
+    try:
+        # Inject axe-core script if not already present
+        axe_script = """
+            if (!window.axe) {
+                var script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.7.0/axe.min.js';
+                script.type = 'text/javascript';
+                document.getElementsByTagName('head')[0].appendChild(script);
+                
+                // Wait for script to load
+                return new Promise((resolve) => {
+                    script.onload = () => {
+                        axe.configure({
+                            allowedOrigins: ['<same_origin>'],
+                            rules: []
+                        });
+                        resolve(true);
+                    };
+                });
+            }
+            return Promise.resolve(true);
+        """
+        driver.execute_async_script(axe_script)
+        time.sleep(1)  # Give a moment for axe to initialize
+        
+        # Now get the accessibility tree
+        return driver.execute_script("""
+            return {
+                url: window.location.href,
+                title: document.title,
+                tree: axe.utils.getSelector(document.documentElement)
+            };
+        """)
+    except Exception as e:
+        logging.error(f"Error getting accessibility tree: {str(e)}")
+        return {}
+
+def save_accessibility_tree(tree: Dict[str, Any], filepath: str) -> bool:
+    """Save accessibility tree to file"""
+    try:
+        Path(filepath).parent.mkdir(parents=True, exist_ok=True)
+        with open(filepath, 'w') as f:
+            json.dump(tree, f, indent=2)
+        logging.info(f"Accessibility tree saved to {filepath}")
+        return True
+    except Exception as e:
+        logging.error(f"Error saving accessibility tree: {str(e)}")
+        return False
+
+def load_tasks_with_ground_truth(tasks_file: str) -> List[Dict[str, Any]]:
+    """Load tasks from JSONL file. Ground truth paths are now included in the tasks file."""
+    tasks = []
+    with open(tasks_file) as f:
+        for line in f:
+            if line.strip():
+                task = json.loads(line)
+                tasks.append(task)
+    return tasks
 
 def load_tasks(tasks_file: str) -> List[Dict[str, Any]]:
     """Load tasks from JSONL file"""
@@ -122,18 +158,5 @@ def load_tasks(tasks_file: str) -> List[Dict[str, Any]]:
 
 def save_results(results: List[Dict[str, Any]], output_file: str) -> None:
     """Save benchmark results to JSON file"""
-    # Convert any numpy types to Python types
-    serializable_results = []
-    for result in results:
-        serializable_result = {}
-        for key, value in result.items():
-            if isinstance(value, np.floating):
-                serializable_result[key] = float(value)
-            elif isinstance(value, np.integer):
-                serializable_result[key] = int(value)
-            else:
-                serializable_result[key] = value
-        serializable_results.append(serializable_result)
-    
     with open(output_file, 'w') as f:
-        json.dump(serializable_results, f, indent=2)
+        json.dump(results, f, indent=2)

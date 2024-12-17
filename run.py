@@ -1,18 +1,22 @@
 import argparse
 import json
-import logging
+import os
 import time
+import logging
 from pathlib import Path
-from typing import Dict, List, Any
-
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+from utils import execute_interaction, save_screenshot, get_accessibility_tree, save_accessibility_tree, load_tasks_with_ground_truth, save_results
+from evaluation.auto_eval import run_evaluation
+from openai import OpenAI
+from dotenv import load_dotenv
 
-from utils import WebInteractionUtils, load_tasks, save_results, get_accessibility_tree, compute_image_similarity
+# Load environment variables at the start
+load_dotenv()
 
-def setup_logger(output_dir: Path) -> None:
+def setup_logging(output_dir: Path) -> None:
     """Setup logging configuration"""
     log_file = output_dir / "benchmark.log"
     logging.basicConfig(
@@ -24,142 +28,148 @@ def setup_logger(output_dir: Path) -> None:
         ]
     )
 
-def setup_driver(
-    headless: bool = True,
-    download_dir: str = None,
-    force_device_scale: bool = True
-) -> webdriver.Chrome:
-    """Setup Chrome WebDriver with specified options"""
-    options = Options()
+def construct_interaction(task):
+    """Construct interaction dict from task"""
+    return {
+        "action": task.get("interaction", "click"),  # Default to click
+        "selector": f"{task['target_element']['type']}={task['target_element']['value']}" if task.get('target_element') else "",
+        "value": task.get("input_text", "")  # For type actions
+    }
+
+def main():
+    parser = argparse.ArgumentParser(description='Run web automation tasks')
+    parser.add_argument('--tasks', required=True, help='Path to tasks JSONL file')
+    parser.add_argument('--output', required=True, help='Output directory for results')
+    parser.add_argument('--save-accessibility-tree', action='store_true', help='Save accessibility tree')
+    parser.add_argument('--evaluate', action='store_true', help='Run evaluation after benchmark')
+    parser.add_argument('--wait-time', type=float, default=2.0, help='Wait time in seconds after page load and interactions')
+    args = parser.parse_args()
+
+    # Create output directory and setup logging
+    output_dir = Path(args.output)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    setup_logging(output_dir)
     
-    if force_device_scale:
-        options.add_argument("--force-device-scale-factor=1")
-    if headless:
-        options.add_argument("--headless")
-        options.add_argument(
-            "--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
-        )
-    if download_dir:
-        options.add_experimental_option(
-            "prefs", {"download.default_directory": download_dir}
-        )
-    
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
+    # Setup Chrome
+    chrome_options = Options()
+    # chrome_options.add_argument('--headless')  # Comment out headless for debugging
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument('--force-device-scale-factor=1')
+    chrome_options.add_argument('--window-size=1920,1080')  # Add window size
+    chrome_options.add_argument(
+        'user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36'
+    )
     
     service = Service(ChromeDriverManager().install())
-    return webdriver.Chrome(service=service, options=options)
-
-def run_benchmark(
-    tasks_file: Path,
-    output_dir: Path,
-    headless: bool = True,
-    force_device_scale: bool = True,
-    save_accessibility_tree: bool = True,
-    image_match_threshold: float = 0.95
-) -> None:
-    """Run the DOM benchmark"""
-    
-    # Setup
-    output_dir.mkdir(parents=True, exist_ok=True)
-    setup_logger(output_dir)
-    
-    # Load tasks
-    tasks = load_tasks(tasks_file)
-    logging.info(f"Loaded {len(tasks)} tasks from {tasks_file}")
-    
-    # Setup WebDriver
-    driver = setup_driver(
-        headless=headless,
-        download_dir=str(output_dir / "downloads"),
-        force_device_scale=force_device_scale
-    )
-    utils = WebInteractionUtils(driver)
+    driver = webdriver.Chrome(service=service, options=chrome_options)
     
     try:
+        # Load tasks
+        tasks = load_tasks_with_ground_truth(args.tasks)
+        logging.info(f"Loaded {len(tasks)} tasks")
         results = []
-        for i, task in enumerate(tasks):
-            task_id = task["id"]
-            logging.info(f"Running task {i+1}/{len(tasks)}: {task_id}")
-            
-            # Load webpage
-            driver.get(task["web"])
-            time.sleep(2)  # Wait for page load
-            
-            # Get accessibility tree
-            if save_accessibility_tree:
-                tree_file = output_dir / f"accessibility_tree_{task_id}.json"
-                tree = get_accessibility_tree(driver, str(tree_file))
-                logging.info(f"Saved accessibility tree to {tree_file}")
-            
-            # Take before screenshot
-            before_screenshot = output_dir / f"before_{task_id}.png"
-            driver.save_screenshot(str(before_screenshot))
-            
-            # Execute interaction
-            success = utils.execute_interaction(task)
-            time.sleep(1)  # Wait for interaction effect
-            
-            # Take after screenshot
-            after_screenshot = output_dir / f"after_{task_id}.png"
-            driver.save_screenshot(str(after_screenshot))
-            
-            # Compare screenshots
-            image_similarity = compute_image_similarity(str(before_screenshot), str(after_screenshot))
-            
-            # Save result
-            result = {
-                "task_id": task_id,
-                "success": success,
-                "image_similarity": image_similarity,
-                "passed_threshold": image_similarity >= image_match_threshold,
-                "timestamp": time.time(),
-                "accessibility_tree": str(tree_file) if save_accessibility_tree else None
-            }
-            results.append(result)
-            
-            logging.info(
-                f"Task {task_id} completed: success={success}, "
-                f"image_similarity={image_similarity:.3f}"
-            )
         
-        # Save results
+        for i, task in enumerate(tasks, 1):
+            task_id = task.get('id', 'unknown')
+            logging.info(f"\nProcessing task {i}/{len(tasks)}: {task_id}")
+            logging.info(f"Task description: {task.get('task', 'No description')}")
+            
+            result = {
+                'task_id': task_id,
+                'success': False,
+                'error': None,
+                'task_description': task.get('task'),
+                'timestamp': time.time()
+            }
+            
+            try:
+                # Navigate to page
+                url = task.get('web')  # Use 'web' field from task
+                if not url:
+                    raise ValueError("No URL provided in task")
+                    
+                logging.info(f"Navigating to {url}")
+                driver.get(url)
+                time.sleep(args.wait_time)  # Wait for page load
+                
+                # Save before screenshot
+                before_screenshot = str(output_dir / f"{task_id}_before.png")
+                save_screenshot(driver, before_screenshot)
+                result['before_screenshot'] = before_screenshot
+                logging.info(f"Saved before screenshot: {before_screenshot}")
+                
+                # Save accessibility tree before interaction
+                if args.save_accessibility_tree:
+                    before_tree = get_accessibility_tree(driver)
+                    before_tree_path = str(output_dir / f"{task_id}_before_tree.json")
+                    save_accessibility_tree(before_tree, before_tree_path)
+                    result['before_tree'] = before_tree_path
+                    logging.info(f"Saved before accessibility tree: {before_tree_path}")
+                
+                # Construct and execute interaction
+                interaction = construct_interaction(task)
+                logging.info(f"Executing interaction: {interaction}")
+                success = execute_interaction(driver, interaction)
+                time.sleep(args.wait_time)  # Wait for interaction effects
+                
+                # Save after screenshot
+                after_screenshot = str(output_dir / f"{task_id}_after.png")
+                save_screenshot(driver, after_screenshot)
+                result['after_screenshot'] = after_screenshot
+                logging.info(f"Saved after screenshot: {after_screenshot}")
+                
+                # Save accessibility tree after interaction
+                if args.save_accessibility_tree:
+                    after_tree = get_accessibility_tree(driver)
+                    after_tree_path = str(output_dir / f"{task_id}_after_tree.json")
+                    save_accessibility_tree(after_tree, after_tree_path)
+                    result['after_tree'] = after_tree_path
+                    logging.info(f"Saved after accessibility tree: {after_tree_path}")
+                
+                result['success'] = success
+                logging.info(f"Task completed successfully: {success}")
+                
+            except Exception as e:
+                result['error'] = str(e)
+                logging.error(f"Error processing task {task_id}: {str(e)}", exc_info=True)
+                
+            results.append(result)
+        
+        # Save results to JSON file
         results_file = output_dir / "results.json"
         save_results(results, str(results_file))
         logging.info(f"Results saved to {results_file}")
         
+        # Run evaluation if requested
+        if args.evaluate:
+            openai_key = os.getenv("OPENAI_API_KEY")
+            if not openai_key:
+                logging.error("No OpenAI API key found in environment")
+                return
+            
+            eval_output = output_dir / "evaluation.json"
+            run_evaluation(
+                tasks_file=Path(args.tasks),
+                results_dir=results_file,
+                output_file=eval_output,
+                openai_key=openai_key
+            )
+            logging.info(f"Evaluation complete. Results saved to {eval_output}")
+        
         # Print summary
-        successful = sum(1 for r in results if r["success"])
-        passed_threshold = sum(1 for r in results if r["passed_threshold"])
+        successful = sum(1 for r in results if r['success'])
+        errors = sum(1 for r in results if r.get('error'))
         logging.info(
             f"\nBenchmark Summary:\n"
             f"Total Tasks: {len(tasks)}\n"
             f"Successful Interactions: {successful}\n"
-            f"Passed Image Threshold: {passed_threshold}\n"
+            f"Failed Tasks: {errors}\n"
+            f"Success Rate: {(successful/len(tasks))*100:.1f}%"
         )
         
     finally:
         driver.quit()
 
-def main():
-    parser = argparse.ArgumentParser(description="Run DOM Benchmark")
-    parser.add_argument("--tasks", type=Path, required=True, help="Path to tasks JSONL file")
-    parser.add_argument("--output", type=Path, required=True, help="Output directory for results")
-    parser.add_argument("--headless", action="store_true", help="Run Chrome in headless mode")
-    parser.add_argument("--force-device-scale", action="store_true", help="Force device scale factor to 1")
-    parser.add_argument("--save-accessibility-tree", action="store_true", help="Save accessibility tree for each task")
-    parser.add_argument("--threshold", type=float, default=0.95, help="Image similarity threshold")
-    
-    args = parser.parse_args()
-    
-    run_benchmark(
-        tasks_file=args.tasks,
-        output_dir=args.output,
-        headless=args.headless,
-        force_device_scale=args.force_device_scale,
-        save_accessibility_tree=args.save_accessibility_tree,
-        image_match_threshold=args.threshold
-    )
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

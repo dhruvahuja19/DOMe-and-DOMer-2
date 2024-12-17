@@ -4,7 +4,23 @@ from pathlib import Path
 from parallel_runner import run_parallel_benchmark
 from serial_runner import run_serial_benchmark
 from evaluation.auto_eval import run_evaluation
+from models import GPT4Model, ClaudeModel, GeminiModel
 import os
+
+def get_model(model_name):
+    """Get the appropriate model based on command line argument."""
+    load_dotenv()
+    
+    models = {
+        'gpt4': lambda: GPT4Model(api_key=os.getenv("OPENAI_API_KEY")),
+        'claude': lambda: ClaudeModel(api_key=os.getenv("ANTHROPIC_API_KEY")),
+        'gemini': lambda: GeminiModel(api_key=os.getenv("GOOGLE_API_KEY"))
+    }
+    
+    if model_name not in models:
+        raise ValueError(f"Model {model_name} not supported. Choose from: {', '.join(models.keys())}")
+    
+    return models[model_name]()
 
 def main():
     parser = argparse.ArgumentParser(description='Run web automation tasks')
@@ -18,8 +34,12 @@ def main():
     parser.add_argument('--evaluate', action='store_true', help='Run evaluation after benchmark')
     parser.add_argument('--evaluate-mode', type=str, choices=['serial', 'parallel'], default='parallel',
                        help='Run evaluations serially or in parallel')
+    parser.add_argument('--model', choices=['gpt4', 'claude', 'gemini'], default='gpt4', help='Model to use for the benchmark')
     
     args = parser.parse_args()
+    
+    # Initialize the selected model
+    model = get_model(args.model)
     
     # Create output directory
     output_dir = Path(args.output)
@@ -30,16 +50,22 @@ def main():
         results = run_parallel_benchmark(
             tasks_file=args.tasks,
             output_dir=args.output,
+            model=model,
             max_workers=args.max_workers,
             save_accessibility_tree=args.save_accessibility_tree,
-            wait_time=args.wait_time
+            wait_time=args.wait_time,
+            evaluate=args.evaluate,
+            evaluate_mode=args.evaluate_mode
         )
     else:
         results = run_serial_benchmark(
             tasks_file=args.tasks,
             output_dir=args.output,
+            model=model,
             save_accessibility_tree=args.save_accessibility_tree,
-            wait_time=args.wait_time
+            wait_time=args.wait_time,
+            evaluate=args.evaluate,
+            evaluate_mode=args.evaluate_mode
         )
     
     # Save results

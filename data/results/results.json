@@ -1,0 +1,32 @@
+[
+  {
+    "task_id": "cambridge_lookup_1",
+    "success": true,
+    "error": null,
+    "task_description": "Click the search box and type 'hello'",
+    "timestamp": 1734414911.060281,
+    "before_screenshot": "data/results/cambridge_lookup_1_before.png",
+    "html_element": "<input autofocus=\"\" aria-label=\"Search\" spellcheck=\"false\" type=\"text\" name=\"q\" autocomplete=\"off\" autocapitalize=\"none\" aria-required=\"true\" aria-invalid=\"false\" class=\"ft fon pr pt0 hbr-20 lc1 lp-10 lpl-15 cdo-search-input\" id=\"searchword\" lang=\"en\" [placeholder]=\"stateSearch.dataset_search\" value=\"\" [value]=\"stateSearch.lookupWord\" maxlength=\"100\" placeholder=\"Search English\" on=\"input-debounced: AMP.setState({ stateSearch: { term: event.value, autocomplete: (stateSearch.dataset != 'wordlists' &amp;&amp; event.value.length) > 1 ? true : false } }), searchAutoComplete.changeToLayoutContainer();\n                         tap:AMP.setState({ stateSearch: { autocomplete: stateSearch.dataset != 'wordlists' &amp;&amp; stateSearch.term.length > 1 } })\">",
+    "after_screenshot": "data/results/cambridge_lookup_1_after.png"
+  },
+  {
+    "task_id": "amazon_cart_1",
+    "success": true,
+    "error": null,
+    "task_description": "Click the Cart button",
+    "timestamp": 1734414920.565016,
+    "before_screenshot": "data/results/amazon_cart_1_before.png",
+    "html_element": "<a href=\"/gp/cart/view.html?ref_=nav_cart\" aria-label=\"0 items in cart\" class=\"nav-a nav-a-2 nav-progressive-attribute\" id=\"nav-cart\">\n    <div id=\"nav-cart-count-container\">\n      <span id=\"nav-cart-count\" aria-hidden=\"true\" class=\"nav-cart-count nav-cart-0 nav-progressive-attribute nav-progressive-content\">0</span>\n      <span class=\"nav-cart-icon nav-sprite\"></span>\n    </div>\n    <div id=\"nav-cart-text-container\" class=\" nav-progressive-attribute\">\n      <span aria-hidden=\"true\" class=\"nav-line-1\">\n        \n      </span>\n      <span aria-hidden=\"true\" class=\"nav-line-2\">\n        Cart\n        <span class=\"nav-icon nav-arrow\"></span>\n      </span>\n    </div>\n  </a>",
+    "after_screenshot": "data/results/amazon_cart_1_after.png"
+  },
+  {
+    "task_id": "maps_search_1",
+    "success": false,
+    "error": null,
+    "task_description": "Type 'San Francisco' into the search box and press search",
+    "timestamp": 1734414926.718493,
+    "before_screenshot": "data/results/maps_search_1_before.png",
+    "html_element": "<input class=\"fontBodyMedium searchboxinput xiQnY \" role=\"combobox\" jslog=\"11886\" aria-controls=\"ydp1wd-haAclf\" aria-expanded=\"false\" aria-haspopup=\"grid\" autocomplete=\"off\" autofocus=\"\" id=\"searchboxinput\" name=\"q\" jsaction=\"keyup:omnibox.keyUp; input:omnibox.inputDetected; keydown:omnibox.keyDown; focus:omnibox.focus; blur:omnibox.blur\">",
+    "after_screenshot": "data/results/maps_search_1_after.png"
+  }
+]

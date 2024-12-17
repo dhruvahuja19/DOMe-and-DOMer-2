@@ -10,6 +10,59 @@ DOM and DOMer-2 focuses on testing a model's ability to interact with web elemen
 2. Real websites with diverse DOM structures
 3. Ground truth screenshots for validation
 4. GPT-4V based evaluation
+5. Support for both serial and parallel execution
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/DOMe-and-DOMer-2.git
+cd DOMe-and-DOMer-2
+```
+
+2. Install dependencies using pip:
+```bash
+pip install -e .
+```
+
+Required dependencies:
+- selenium
+- webdriver-manager
+- Pillow
+- numpy
+- requests
+- beautifulsoup4
+- openai
+- python-dotenv
+
+3. Set up your OpenAI API key in a `.env` file:
+```bash
+OPENAI_API_KEY=your_api_key_here
+```
+
+## Usage
+
+The benchmark can be run in either serial or parallel mode:
+
+### Parallel Mode (Default)
+```bash
+python run.py --tasks data/dom_tasks.jsonl --output results --max-workers 4 --evaluate
+```
+
+### Serial Mode
+```bash
+python run.py --tasks data/dom_tasks.jsonl --output results --mode serial --evaluate
+```
+
+### Key Arguments
+- `--tasks`: Path to JSONL file containing tasks
+- `--output`: Output directory for results
+- `--mode`: Run tasks in 'serial' or 'parallel' mode (default: parallel)
+- `--max-workers`: Number of parallel workers (default: 4)
+- `--evaluate`: Run GPT-4V evaluation after tasks complete
+- `--evaluate-mode`: Run evaluations in 'serial' or 'parallel' mode (default: parallel)
+- `--save-accessibility-tree`: Save accessibility trees for each task
+- `--wait-time`: Wait time between actions in seconds (default: 2.0)
 
 ## Directory Structure
 
@@ -17,24 +70,30 @@ DOM and DOMer-2 focuses on testing a model's ability to interact with web elemen
 DOMe-and-DOMer-2/
 ├── data/
 │   ├── dom_tasks.jsonl         # Task definitions
-│   └── ground_truth/          # Ground truth screenshots
-│       ├── amazon_search_1_gt.png
-│       └── ...
+│   └── task_schema.json        # JSON schema for tasks
 ├── evaluation/
-│   ├── auto_eval.py           # GPT-4V evaluation script
-│   └── README.md              # Evaluation documentation
-├── results/                   # Results for each run
-│   └── run_001/
-│       ├── before_*.png       # Screenshots before interaction
-│       ├── after_*.png        # Screenshots after interaction
-│       ├── accessibility_*.json  # Accessibility trees
-│       ├── results.json       # Raw results
-│       ├── evaluation.json    # GPT-4V evaluations
-│       └── benchmark.log      # Detailed logs
-├── prompts.py                # LLM system prompts
-├── run.py                    # Main benchmark runner
-├── utils.py                 # Utility functions
-└── requirements.txt         # Dependencies
+│   ├── auto_eval.py           # Evaluation orchestrator
+│   ├── parallel_eval.py       # Parallel evaluation implementation
+│   ├── image_match.py         # GPT-4V image comparison
+│   └── fuzzy_match.py         # HTML structure comparison
+├── parallel_runner.py         # Parallel task execution
+├── serial_runner.py          # Serial task execution
+├── utils.py                  # Shared utilities
+├── run.py                    # Main entry point
+└── pyproject.toml           # Project configuration and dependencies
+
+## Output Structure
+
+Results are saved in the specified output directory:
+```
+output_dir/
+├── results.json              # Task execution results
+├── evaluation.json           # GPT-4V evaluation results
+├── benchmark.log            # Execution logs
+├── *_before.png            # Screenshots before interaction
+├── *_after.png             # Screenshots after interaction
+└── *_tree.json            # Accessibility trees (if enabled)
+```
 
 ## Task Format
 
@@ -42,143 +101,34 @@ Tasks are defined in `data/dom_tasks.jsonl`:
 
 ```json
 {
-    "web_name": "Cambridge Dictionary",
-    "id": "cambridge_lookup_1",
+    "id": "task_id",
     "task": "Click the search box and type 'hello'",
-    "web": "https://dictionary.cambridge.org/",
-    "element_type": "input",
+    "web": "https://example.com",
     "interaction": "type",
     "target_element": {
-        "type": "id",
-        "value": "searchword"
+        "type": "css",
+        "value": "#searchbox"
     },
     "input_text": "hello",
-    "target_html": "<input id='searchword' type='text' ...>",
     "ground_truth": {
-        "screenshot": "evaluation/ground_truth/task_1_gt.png",
-        "description": "The word 'hello' has been entered in the search box"
+        "screenshot": "path/to/ground_truth.png"
     }
 }
 ```
 
-Key fields:
-- `target_element`: Selector information for finding the element
-- `target_html`: Expected HTML structure of the element
-- `ground_truth`: Reference screenshot and description
+## Evaluation
 
-## Ground Truth
+The benchmark uses GPT-4V to evaluate task success by comparing:
+1. Before/after screenshots with ground truth
+2. DOM structure changes
+3. Task completion criteria
 
-Ground truth is provided in two forms:
-1. **Screenshots**: Visual state after successful interaction
-2. **Descriptions**: Text description of expected changes
-
-Located in `data/ground_truth/`, each task has:
-- `[task_id]_gt.png`: Screenshot of successful interaction
-- Description in task JSON explaining expected changes
-
-## Environment Setup
-
-1. Create a virtual environment and install dependencies:
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-```
-
-2. Set up environment variables in `.env`:
-```bash
-OPENAI_API_KEY=your_openai_api_key
-```
-
-## Running the Benchmark
-
-```bash
-python run.py --tasks data/dom_tasks.jsonl --output data/results --evaluate
-```
-
-This will:
-1. Execute each task in the tasks file
-2. Save screenshots and results
-3. Compare actual HTML elements with expected ones
-4. Run GPT-4V evaluation on screenshots
-
-## Ground Truth Management
-
-Ground truth images are stored in `evaluation/ground_truth/` with a consistent naming scheme:
-```
-evaluation/ground_truth/
-└── task_1_gt.png
-└── task_2_gt.png
-...
-```
-
-The tasks file references these images using relative paths:
-```json
-{
-  "id": 1,
-  "ground_truth": {
-    "screenshot": "evaluation/ground_truth/task_1_gt.png"
-  }
-}
-```
-
-## Testing
-
-Run environment tests:
-```bash
-python test_env.py
-```
-
-Run OpenAI API connection test:
-```bash
-python test_openai.py
-```
-
-## Evaluation Process
-
-1. **Technical Validation**:
-   - Element found and interacted with
-   - No errors during interaction
-   - Accessibility tree verification
-
-2. **Visual Validation**:
-   - Compare after screenshot with ground truth
-   - Verify expected visual changes
-   - Check for unintended side effects
-
-3. **GPT-4V Analysis**:
-   - Compare before/after/ground-truth screenshots
-   - Verify interaction success
-   - Check visual state matches expectations
-
-## Output Format
-
-```json
-{
-    "total_tasks": 10,
-    "successful_tasks": 8,
-    "evaluations": [
-        {
-            "task_id": "amazon_search_1",
-            "success": true,
-            "evaluation": "Detailed evaluation text...",
-            "timestamp": 1234567890
-        }
-    ]
-}
-```
-
-## Requirements
-
-- Python 3.8+
-- Chrome/Chromium browser
-- OpenAI API key (for evaluation)
-- Required packages in `requirements.txt`
+Evaluation can be run in parallel or serial mode and produces detailed scoring and reasoning for each task.
 
 ## Contributing
 
-[Contributing guidelines will be added]
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-[License information will be added]
+This project is licensed under the MIT License - see the LICENSE file for details.

@@ -20,7 +20,6 @@ def test_openai_connection():
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": "Say hello"}],
-            max_tokens=10
         )
         logger.info("Successfully connected to OpenAI API")
         logger.debug(f"Response: {response.choices[0].message.content}")

@@ -67,7 +67,6 @@ def compare_images(prompt, ground_truth_path, agent_image_path, note = None, ope
     response = client.chat.completions.create(
         model="gpt-4-turbo", 
         messages=messages,
-        max_tokens=500
     )
     
     print("\n=== Judge's Visual Evaluation ===")

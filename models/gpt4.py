@@ -15,12 +15,12 @@ class GPT4Model(BaseModel):
         self.temperature = model_config.get("temperature", 0)
         self.max_tokens = model_config.get("max_tokens", 1000)
         
-        # Enhanced system prompt based on WebVoyager
+        # Enhanced system prompt with hover support
         self.system_prompt = """You are an AI assistant that helps users interact with web elements.
 Your task is to understand the user's intent and generate precise web element interactions.
 
 For each task, analyze:
-1. The user's goal and required interaction (click, type, scroll, wait)
+1. The user's goal and required interaction (click, type, scroll, wait, hover)
 2. The target element's properties and accessibility
 3. Any constraints or special conditions
 
@@ -30,19 +30,29 @@ Key Guidelines:
 3. Handle dynamic content and loading states
 4. Pay attention to timing and wait states
 5. Validate success criteria for each interaction
+6. For hover actions:
+   - Ensure element is visible and interactable
+   - Consider dynamic content (dropdowns, tooltips)
+   - Validate hover effects and state changes
 
-Respond with a JSON object in this format:
+Generate interactions in this JSON format:
 {
-    "action": "click|type|scroll|wait",
+    "action": "click|type|scroll|wait|hover",
     "selector_type": "css|xpath|id",
     "selector_value": "string",
     "input_text": "string",  # For type actions
     "wait_time": integer,    # For wait actions in seconds
     "scroll_direction": "up|down",  # For scroll actions
+    "hover_duration": integer,  # For hover actions in milliseconds
     "validation": {
-        "expected_state": "visible|hidden|text_present|text_absent",
+        "expected_state": "visible|hidden|text_present|text_absent|hover_effect",
         "validation_selector": "string",  # Element to validate
-        "expected_text": "string"  # For text validation
+        "expected_text": "string",  # For text validation
+        "hover_effects": {  # For hover validation
+            "type": "tooltip|dropdown|style_change",
+            "target_selector": "string",  # Element affected by hover
+            "expected_changes": ["color_change", "visibility", "content"]
+        }
     }
 }"""
 
@@ -62,10 +72,11 @@ Respond with a JSON object in this format:
                 return None, True
                 
             wait_time = min(2 ** retry_count, 60)  # Exponential backoff
-            if hasattr(e, "__class__") and e.__class__.__name__ == "RateLimitError":
-                wait_time = max(wait_time, 10)
-            elif hasattr(e, "__class__") and e.__class__.__name__ == "APIError":
-                wait_time = max(wait_time, 15)
+            if hasattr(e, "__class__"):
+                if e.__class__.__name__ == "RateLimitError":
+                    wait_time = max(wait_time, 10)
+                elif e.__class__.__name__ == "APIError":
+                    wait_time = max(wait_time, 15)
                 
             print(f"API call failed, retrying in {wait_time}s. Error: {str(e)}")
             time.sleep(wait_time)
@@ -82,6 +93,7 @@ Consider:
 1. Is this a multi-step interaction?
 2. Are there any loading or dynamic states to handle?
 3. What validation should be performed?
+4. For hover: what effects should we validate?
 
 Generate the optimal web interaction instruction as a JSON object."""
 
@@ -105,6 +117,7 @@ Generate the optimal web interaction instruction as a JSON object."""
                 input_text=interaction_data.get('input_text'),
                 description=task['task'],
                 wait_time=interaction_data.get('wait_time', 0),
+                hover_duration=interaction_data.get('hover_duration', 0),
                 validation=interaction_data.get('validation', {})
             )
         except Exception as e:
@@ -131,7 +144,8 @@ Analyze the error and suggest a solution considering:
 1. Is this a timing/loading issue?
 2. Is the selector still valid?
 3. Is the element interactive?
-4. Are there any prerequisite steps missing?
+4. For hover: is the element hoverable?
+5. Are there any prerequisite steps missing?
 
 Generate a modified interaction as a JSON object or respond with "GIVE UP" if unrecoverable."""
 
@@ -157,6 +171,7 @@ Generate a modified interaction as a JSON object or respond with "GIVE UP" if un
                 input_text=interaction_data.get('input_text'),
                 description=f"Error recovery: {task['task']}",
                 wait_time=interaction_data.get('wait_time', 0),
+                hover_duration=interaction_data.get('hover_duration', 0),
                 validation=interaction_data.get('validation', {})
             )
         except Exception as e:
@@ -178,7 +193,8 @@ Evaluate the interaction success based on:
 1. Element state changes (visibility, content, attributes)
 2. Page state changes (URL, dynamic content)
 3. Error messages or warnings
-4. Expected outcomes from validation rules
+4. For hover: validate expected hover effects
+5. Expected outcomes from validation rules
 
 Respond with:
 - "YES" if all success criteria are met

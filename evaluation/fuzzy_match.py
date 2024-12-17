@@ -71,7 +71,6 @@ Respond True if:
     response = client.chat.completions.create(
         model="gpt-4",
         messages=messages,
-        max_tokens=400,
         temperature=0,
         stream=False
     )

@@ -3,15 +3,15 @@ import json
 import time
 import logging
 from pathlib import Path
-from typing import Dict, Any, List, Optional, Union
+from typing import Dict, Any, List, Optional, Union, Tuple
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
-def execute_interaction(driver: webdriver.Chrome, interaction: Dict[str, Any]) -> bool:
-    """Execute a single interaction on the webpage"""
+def execute_interaction(driver: webdriver.Chrome, interaction: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
+    """Execute a single interaction on the webpage and return success status and element HTML"""
     try:
         action = interaction.get("action", "").lower()
         selector = interaction.get("selector", "")
@@ -19,13 +19,13 @@ def execute_interaction(driver: webdriver.Chrome, interaction: Dict[str, Any]) -
         
         if not selector:
             logging.warning("No selector provided for interaction")
-            return False
+            return False, None
             
         # Parse selector in format "type=value"
         selector_parts = selector.split('=', 1)
         if len(selector_parts) != 2:
             logging.error(f"Invalid selector format: {selector}")
-            return False
+            return False, None
             
         selector_type, selector_value = selector_parts
         
@@ -42,38 +42,31 @@ def execute_interaction(driver: webdriver.Chrome, interaction: Dict[str, Any]) -
         by_type = selector_map.get(selector_type.lower())
         if not by_type:
             logging.error(f"Unsupported selector type: {selector_type}")
-            return False
+            return False, None
         
         # Wait for element to be present and interactable
         wait = WebDriverWait(driver, 10)
         element = wait.until(EC.presence_of_element_located((by_type, selector_value)))
         wait.until(EC.element_to_be_clickable((by_type, selector_value)))
         
-        logging.info(f"Found element using {selector_type}={selector_value}")
+        # Get element's outer HTML
+        element_html = element.get_attribute('outerHTML')
         
+        # Execute the interaction
         if action == "click":
             element.click()
-            logging.info("Clicked element")
         elif action == "type":
             element.clear()
             element.send_keys(value)
-            logging.info(f"Typed '{value}' into element")
         else:
-            logging.warning(f"Unsupported action: {action}")
-            return False
+            logging.error(f"Unsupported action: {action}")
+            return False, element_html
             
-        time.sleep(1)  # Allow for any animations/state changes
-        return True
+        return True, element_html
         
-    except TimeoutException:
-        logging.error(f"Timeout waiting for element: {selector}")
-        return False
-    except NoSuchElementException:
-        logging.error(f"Element not found: {selector}")
-        return False
     except Exception as e:
-        logging.error(f"Error executing interaction: {str(e)}", exc_info=True)
-        return False
+        logging.error(f"Error executing interaction: {str(e)}")
+        return False, None
 
 def save_screenshot(driver: webdriver.Chrome, filepath: str) -> bool:
     """Save screenshot of the current page state"""

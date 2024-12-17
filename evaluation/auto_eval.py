@@ -40,21 +40,26 @@ def run_evaluation(
             )
             
             # HTML comparison using fuzzy_match
-            html_similarity = fuzzy_match_html(
+            html_correctness, html_reasoning = fuzzy_match_html(
                 task_description=f"{task['task']}\nInteraction: {task['interaction']}\nExpected: {task.get('expected_outcome', 'Complete the task as specified')}",
                 actual_html=result.get("html_element", ""),
                 expected_html=task.get('target_html', ''),
                 openai_client=client
             )
 
+            # Convert bool to float for scoring
+            visual_score = 1.0 if visual_correctness else 0.0
+            html_score = 1.0 if html_correctness else 0.0
+
             # Combine scores and create evaluation
             evaluation = {
                 "task_id": task.get("id"),
                 "success": result["success"],
-                "visual_score": visual_correctness,
-                "html_score": html_similarity,
-                "final_score": (visual_correctness + html_similarity) / 2,
-                "reasoning": visual_reasoning
+                "visual_score": visual_score,
+                "html_score": html_score,
+                "final_score": (visual_score + html_score) / 2,
+                "visual_reasoning": visual_reasoning,
+                "html_reasoning": html_reasoning
             }
             evaluations.append(evaluation)
             logging.info(f"Evaluated task {task_id}: score={evaluation.get('final_score', 0.0):.2f}")

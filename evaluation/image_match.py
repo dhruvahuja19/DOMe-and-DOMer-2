@@ -54,20 +54,20 @@ def compare_images(prompt, ground_truth_path, agent_image_path, note = None, ope
             "content": [
                 {"type": "text", "text": user_prompt},
                 {
-                    "type": "image",
-                    "image_url": f"data:image/jpeg;base64,{image1}"
+                    "type": "image_url",
+                    "image_url": {"url": f"data:image/jpeg;base64,{image1}"}
                 },
                 {
-                    "type": "image",
-                    "image_url": f"data:image/jpeg;base64,{image2}"
+                    "type": "image_url",
+                    "image_url": {"url": f"data:image/jpeg;base64,{image2}"}
                 }
             ]
         }
     ]
     response = client.chat.completions.create(
-        model="gpt-4o",  # Updated model name for vision tasks
+        model="gpt-4-turbo", 
         messages=messages,
-        max_tokens=500,
+        max_tokens=500
     )
     
     print("\n=== Judge's Visual Evaluation ===")

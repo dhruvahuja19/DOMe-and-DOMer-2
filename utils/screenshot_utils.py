@@ -67,8 +67,8 @@ def capture_task_screenshots(task_data, ground_truth_dir):
     try:
         # Create screenshot paths
         task_id = task_data["id"]
-        before_path = Path(ground_truth_dir) / f"{task_id}_before.png"
-        after_path = Path(ground_truth_dir) / f"{task_id}_gt.png"
+        before_path = Path(ground_truth_dir) / f"task_{task_id}_before.png"
+        after_path = Path(ground_truth_dir) / f"task_{task_id}_gt.png"
         
         # Take before screenshot
         take_full_page_screenshot(driver, task_data["web"], str(before_path))
@@ -97,17 +97,20 @@ def capture_task_screenshots(task_data, ground_truth_dir):
     finally:
         driver.quit()
 
-if __name__ == "__main__":
-    # Example usage
-    from pathlib import Path
-    import json
+def main():
+    """Main function to capture screenshots for all tasks"""
+    ground_truth_dir = Path("evaluation/ground_truth")
+    ground_truth_dir.mkdir(exist_ok=True)
     
     # Load tasks
     tasks_file = Path("data/dom_tasks.jsonl")
-    ground_truth_dir = Path("data/ground_truth")
-    ground_truth_dir.mkdir(exist_ok=True)
     
     with open(tasks_file) as f:
         for line in f:
             task = json.loads(line)
             capture_task_screenshots(task, ground_truth_dir)
+
+if __name__ == "__main__":
+    from pathlib import Path
+    import json
+    main()

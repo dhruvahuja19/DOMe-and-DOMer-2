@@ -8,89 +8,70 @@ The evaluation system combines two approaches:
 1. Visual Validation (60% of score): Using GPT-4V to analyze screenshots
 2. HTML Element Validation (40% of score): Comparing actual HTML elements
 
-## Usage
+## Directory Structure
 
+```
+evaluation/
+├── ground_truth/        # Ground truth screenshots
+│   └── task_1_gt.png   # Named consistently as task_{id}_gt.png
+├── auto_eval.py        # Main evaluation script
+├── image_match.py      # GPT-4V based image comparison
+└── fuzzy_match.py      # HTML element comparison
+```
+
+## Environment Setup
+
+1. Ensure you have the OpenAI API key in your `.env` file:
+```bash
+OPENAI_API_KEY=your_openai_api_key
+```
+
+## Running Evaluation
+
+The evaluation is typically run through the main benchmark script:
+```bash
+python ../run.py --tasks data/tasks.jsonl --output data/results --evaluate
+```
+
+Or can be run separately:
 ```bash
 python auto_eval.py \
-    --tasks ../data/dom_tasks.jsonl \
-    --results ../results/run_001 \
-    --output ../results/run_001/evaluation.json \
-    --openai-key YOUR_API_KEY
+    --tasks-file data/tasks.jsonl \
+    --results-dir data/results.json \
+    --output-file data/evaluation.json
 ```
 
 ## Evaluation Process
 
-1. **Visual Validation (60%)**
-   - Compare before/after screenshots
-   - Verify visual changes match expected interaction
-   - Check element visibility and state changes
-   - Uses GPT-4V for intelligent visual comparison
+1. **Visual Validation (GPT-4V)**
+   - Compares before/after screenshots with ground truth
+   - Considers task-specific requirements
+   - Returns a score and detailed reasoning
 
-2. **HTML Element Validation (40%)**
-   - Compare model's selected HTML element with ground truth
-   - Structure score (40%): Tag hierarchy and relationships
-   - Attributes score (30%): Element properties and identifiers
-   - Content score (30%): Inner HTML and text content
+2. **HTML Element Validation**
+   - Compares target HTML with actual interaction
+   - Uses fuzzy matching for robustness
+   - Considers element attributes and structure
 
-3. **Success Criteria**
-   - Visual score ≥ 0.9 for visual validation
-   - HTML similarity score ≥ 0.9 for element validation
-   - Combined weighted score ≥ 0.9 for overall success
+The final score is a weighted average:
+- Visual Score: 60%
+- HTML Score: 40%
 
 ## Output Format
 
 ```json
 {
-    "total_tasks": 10,
-    "successful_tasks": 8,
-    "evaluations": [
-        {
-            "task_id": "task_001",
-            "visual_evaluation": {
-                "score": 0.95,
-                "details": "Detailed visual evaluation..."
-            },
-            "html_evaluation": {
-                "score": 0.92,
-                "structure_score": 0.95,
-                "attributes_score": 0.90,
-                "content_score": 0.89
-            },
-            "final_score": 0.94,
-            "success": true,
-            "timestamp": 1234567890
-        }
-    ]
+  "total_tasks": 10,
+  "successful_tasks": 8,
+  "evaluations": [
+    {
+      "task_id": 1,
+      "success": true,
+      "visual_score": 0.95,
+      "html_score": 0.90,
+      "final_score": 0.93,
+      "reasoning": "..."
+    }
+  ]
 }
 ```
-
-## Scoring Details
-
-### Visual Score (60%)
-- Element visibility and positioning
-- State changes (hover effects, expansions)
-- Content updates and transitions
-- Overall visual accuracy
-
-### HTML Score (40%)
-1. **Structure (40% of HTML score)**
-   - Correct tag name
-   - Parent-child relationships
-   - Sibling context
-
-2. **Attributes (30% of HTML score)**
-   - ID and class matching
-   - ARIA attributes
-   - Event handlers
-   - Custom data attributes
-
-3. **Content (30% of HTML score)**
-   - Inner HTML similarity
-   - Text content matching
-   - Nested element structure
-
-## Requirements
-
-- OpenAI API key with GPT-4V access
-- Python 3.8+
-- Required packages in `requirements.txt`

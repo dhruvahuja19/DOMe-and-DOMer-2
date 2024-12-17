@@ -69,25 +69,62 @@ Located in `data/ground_truth/`, each task has:
 - `[task_id]_gt.png`: Screenshot of successful interaction
 - Description in task JSON explaining expected changes
 
-## Running the Benchmark
+## Environment Setup
 
-1. **Run Tests**:
+1. Create a virtual environment and install dependencies:
 ```bash
-python run.py \
-    --tasks data/dom_tasks.jsonl \
-    --output results/run_001 \
-    --headless \
-    --save-accessibility-tree
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
-2. **Evaluate Results**:
+2. Set up environment variables in `.env`:
 ```bash
-python evaluation/auto_eval.py \
-    --tasks data/dom_tasks.jsonl \
-    --results results/run_001 \
-    --ground-truth data/ground_truth \
-    --output results/run_001/evaluation.json \
-    --openai-key YOUR_API_KEY
+OPENAI_API_KEY=your_openai_api_key
+```
+
+## Running the Benchmark
+
+1. Run tasks:
+```bash
+python run.py --tasks data/dom_tasks.jsonl --output results --evaluate
+```
+
+This will:
+- Execute each task in the tasks file
+- Save screenshots and results to the output directory
+- Run GPT-4V evaluation if --evaluate is specified
+
+## Ground Truth Management
+
+Ground truth images are stored in `evaluation/ground_truth/` with a consistent naming scheme:
+```
+evaluation/ground_truth/
+└── task_1_gt.png
+└── task_2_gt.png
+...
+```
+
+The tasks file references these images using relative paths:
+```json
+{
+  "id": 1,
+  "ground_truth": {
+    "screenshot": "evaluation/ground_truth/task_1_gt.png"
+  }
+}
+```
+
+## Testing
+
+Run environment tests:
+```bash
+python test_env.py
+```
+
+Run OpenAI API connection test:
+```bash
+python test_openai.py
 ```
 
 ## Evaluation Process

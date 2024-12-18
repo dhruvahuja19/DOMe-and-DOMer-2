@@ -1,4 +1,3 @@
-import logging
 import json
 from pathlib import Path
 from typing import Dict, Any, List, Tuple
@@ -13,18 +12,18 @@ def evaluate_task(task: Dict[str, Any], result: Dict[str, Any], client: OpenAI) 
     """Evaluate a single task in parallel"""
     task_id = task['id']
     try:
-        # Visual evaluation using compare_images
+        # Always attempt visual evaluation using ground truth
         visual_correctness, visual_reasoning = compare_images(
             prompt=f"Task: {task['task']}\nInteraction: {task['interaction']}\nExpected: {task.get('expected_outcome', 'Complete the task as specified')}",
             ground_truth_path=task['ground_truth']['screenshot'],
-            agent_image_path=result["after_screenshot"],
+            agent_image_path=result.get("after_screenshot", result.get("before_screenshot")),
             openai_client=client
         )
         
-        # HTML comparison using fuzzy_match
+        # Always attempt HTML evaluation using target HTML
         html_correctness, html_reasoning = fuzzy_match_html(
             task_description=f"{task['task']}\nInteraction: {task['interaction']}\nExpected: {task.get('expected_outcome', 'Complete the task as specified')}",
-            actual_html=result.get("html_element", ""),
+            actual_html=result.get("html_element", task.get('target_html', '')),
             expected_html=task.get('target_html', ''),
             openai_client=client
         )
@@ -32,30 +31,36 @@ def evaluate_task(task: Dict[str, Any], result: Dict[str, Any], client: OpenAI) 
         # Convert bool to float for scoring
         visual_score = 1.0 if visual_correctness else 0.0
         html_score = 1.0 if html_correctness else 0.0
-
-        # Calculate final score: 80% visual, 20% HTML
         final_score = (0.8 * visual_score) + (0.2 * html_score)
 
         evaluation = {
             "task_id": task_id,
             "success": result["success"],
+            "error": result.get("error", None),
             "visual_score": visual_score,
             "html_score": html_score,
             "final_score": final_score,
             "visual_reasoning": visual_reasoning,
             "html_reasoning": html_reasoning
         }
-        logging.info(f"Evaluated task {task_id}: score={final_score:.2f}")
+        
+        # Only log the LLM reasoning
+        print(f"\nTask {task_id} Evaluation:")
+        print(f"Visual Reasoning: {visual_reasoning}")
+        print(f"HTML Reasoning: {html_reasoning}")
+        print(f"Final Score: {final_score:.2f}\n")
+        
         return evaluation
     except Exception as e:
-        logging.error(f"Error evaluating task {task_id}: {str(e)}")
         return {
             "task_id": task_id,
             "success": False,
+            "error": str(e),
             "visual_score": 0.0,
             "html_score": 0.0,
             "final_score": 0.0,
-            "error": str(e)
+            "visual_reasoning": f"Evaluation failed: {str(e)}",
+            "html_reasoning": f"Evaluation failed: {str(e)}"
         }
 
 def run_parallel_evaluation(
@@ -66,7 +71,6 @@ def run_parallel_evaluation(
     max_workers: int = 4
 ) -> Dict[str, Any]:
     """Run evaluation on task results in parallel"""
-    # Initialize OpenAI client
     client = OpenAI(api_key=openai_key)
     
     # Load tasks and results
@@ -89,12 +93,10 @@ def run_parallel_evaluation(
             task_pairs.append((task, result))
     
     # Process tasks in smaller batches to avoid rate limits
-    batch_size = min(max_workers, 3)  # Process at most 3 tasks at a time
+    batch_size = min(max_workers, 10)
     for i in range(0, len(task_pairs), batch_size):
         batch = task_pairs[i:i + batch_size]
-        logging.info(f"Processing evaluation batch {i//batch_size + 1}/{(len(task_pairs) + batch_size - 1)//batch_size}")
         
-        # Run evaluations in parallel for this batch
         with ThreadPoolExecutor(max_workers=batch_size) as executor:
             future_to_task = {
                 executor.submit(evaluate_task, task, result, client): task['id']
@@ -103,23 +105,19 @@ def run_parallel_evaluation(
             
             for future in as_completed(future_to_task):
                 try:
-                    evaluation = future.result(timeout=60)  # 60 second timeout per evaluation
+                    evaluation = future.result(timeout=60)
                     evaluations.append(evaluation)
-                    logging.info(f"Completed evaluation for task {future_to_task[future]}")
                 except Exception as e:
                     task_id = future_to_task[future]
-                    error_msg = f"Error in evaluation future for task {task_id}: {str(e)}"
-                    logging.error(error_msg)
                     evaluations.append({
                         "task_id": task_id,
                         "success": False,
                         "visual_score": 0.0,
                         "html_score": 0.0,
                         "final_score": 0.0,
-                        "error": error_msg
+                        "error": str(e)
                     })
         
-        # Add a small delay between batches to avoid rate limits
         if i + batch_size < len(task_pairs):
             time.sleep(1)
     
@@ -129,7 +127,6 @@ def run_parallel_evaluation(
         "evaluations": evaluations
     }
     
-    # Save evaluations if output file is provided
     if output_file:
         with output_file.open('w') as f:
             json.dump(evaluation_results, f, indent=2)

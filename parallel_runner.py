@@ -1,6 +1,5 @@
 import os
 import time
-import logging
 import queue
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -9,8 +8,16 @@ from pathlib import Path
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.service import Service as ChromeService
-
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import (
+    TimeoutException, 
+    ElementNotInteractableException,
+    StaleElementReferenceException,
+    ElementClickInterceptedException
+)
 from utils import (
     execute_interaction,
     save_screenshot,
@@ -46,16 +53,6 @@ class TaskRunner:
         
         # Create output directory
         self.output_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Setup logging
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(levelname)s - %(message)s',
-            handlers=[
-                logging.FileHandler(self.output_dir / "benchmark.log"),
-                logging.StreamHandler()
-            ]
-        )
         
         # Thread-safe queue for results
         self.results_queue = queue.Queue()
@@ -104,7 +101,6 @@ class TaskRunner:
             if not url:
                 raise ValueError("No URL provided in task")
                 
-            logging.info(f"Task {task_id}: Navigating to {url}")
             driver.get(url)
             time.sleep(self.wait_time)
             
@@ -126,12 +122,12 @@ class TaskRunner:
                 'input_text': web_interaction.input_text
             }
             
-            logging.info(f"Task {task_id}: Executing interaction: {interaction}")
-            success, element_html = execute_interaction(driver, interaction)
-            if not success:
-                raise ValueError("Interaction failed")
-            result['success'] = True
-            result['html_element'] = element_html
+            interaction_result = execute_interaction(driver, interaction['action'], interaction['target_element'], interaction['input_text'])
+            if interaction_result['success']:
+                result['success'] = True
+                result['html_element'] = interaction_result['html_element']
+            else:
+                result['error'] = interaction_result['error']
             time.sleep(self.wait_time)
             
             # Save after screenshot
@@ -148,7 +144,6 @@ class TaskRunner:
             
         except Exception as e:
             result['error'] = str(e)
-            logging.error(f"Error in task {task_id}: {str(e)}", exc_info=True)
             
         finally:
             if driver:
@@ -161,10 +156,9 @@ class TaskRunner:
         results = []
         
         # Process tasks in smaller batches to avoid overwhelming the system
-        batch_size = min(self.max_workers, 5)  # Process at most 5 tasks at a time
+        batch_size = min(self.max_workers, 20)  # Process at most 5 tasks at a time
         for i in range(0, len(tasks), batch_size):
             batch = tasks[i:i + batch_size]
-            logging.info(f"Processing task batch {i//batch_size + 1}/{(len(tasks) + batch_size - 1)//batch_size}")
             
             with ThreadPoolExecutor(max_workers=batch_size) as executor:
                 # Submit batch of tasks
@@ -180,10 +174,8 @@ class TaskRunner:
                     try:
                         result = future.result(timeout=120)  # 2 minute timeout per task
                         results.append(result)
-                        logging.info(f"Completed task {task_id}")
                     except Exception as e:
                         error_msg = f"Task {task_id} failed with error: {str(e)}"
-                        logging.error(error_msg)
                         results.append({
                             'task_id': task_id,
                             'success': False,
@@ -197,6 +189,89 @@ class TaskRunner:
                 time.sleep(1)
         
         return results
+
+def execute_interaction(driver, interaction_type, target_element, input_text=None, timeout=10):
+    """Execute a single interaction with better error handling and logging"""
+    selector_type = target_element.get("type")
+    selector_value = target_element.get("value")
+    result = {
+        "success": False,
+        "html_element": None,
+        "error": None
+    }
+    
+    selector_map = {
+        "id": By.ID,
+        "class": By.CLASS_NAME,
+        "text": By.LINK_TEXT,
+        "css": By.CSS_SELECTOR,
+        "xpath": By.XPATH
+    }
+    
+    try:
+        by_type = selector_map.get(selector_type)
+        if not by_type:
+            raise ValueError(f"Invalid selector type: {selector_type}")
+            
+        wait = WebDriverWait(driver, timeout)
+        
+        # First wait for presence
+        element = wait.until(
+            EC.presence_of_element_located((by_type, selector_value))
+        )
+        
+        # Store HTML as soon as we find the element
+        result["html_element"] = element.get_attribute('outerHTML')
+        
+        # Different wait conditions based on interaction type
+        if interaction_type in ["type", "type_submit"]:
+            element = wait.until(
+                EC.and_((
+                    EC.visibility_of_element_located((by_type, selector_value)),
+                    EC.element_to_be_clickable((by_type, selector_value))
+                ))
+            )
+        else:
+            element = wait.until(
+                EC.element_to_be_clickable((by_type, selector_value))
+            )
+            driver.execute_script("arguments[0].scrollIntoView(true);", element)
+            time.sleep(0.5)
+        
+        # Execute interaction based on type
+        if interaction_type == "click":
+            try:
+                element.click()
+            except ElementClickInterceptedException:
+                driver.execute_script("arguments[0].click();", element)
+        elif interaction_type == "type":
+            element.clear()
+            element.send_keys(input_text)
+        elif interaction_type == "type_submit":
+            element.clear()
+            element.send_keys(input_text)
+            element.send_keys(Keys.RETURN)
+        else:
+            raise ValueError(f"Invalid interaction type: {interaction_type}")
+            
+        result["success"] = True
+        return result
+        
+    except TimeoutException:
+        result["error"] = f"Element not found: {selector_type}={selector_value}"
+        return result
+    except ElementNotInteractableException:
+        result["error"] = f"Element not interactable: {selector_type}={selector_value}"
+        return result
+    except StaleElementReferenceException:
+        result["error"] = f"Element became stale: {selector_type}={selector_value}"
+        return result
+    except ElementClickInterceptedException:
+        result["error"] = f"Click blocked: {selector_type}={selector_value}"
+        return result
+    except Exception as e:
+        result["error"] = str(e)
+        return result
 
 def run_parallel_benchmark(
     tasks_file: str,
@@ -222,7 +297,6 @@ def run_parallel_benchmark(
     """
     # Load tasks
     tasks = load_tasks_with_ground_truth(tasks_file)
-    logging.info(f"Loaded {len(tasks)} tasks")
     
     # Initialize runner
     runner = TaskRunner(

@@ -14,12 +14,12 @@ class GeminiModel(BaseModel):
         self.max_retries = 10
         self.temperature = model_config.get("temperature", 0)
         
-        # Enhanced system prompt based on WebVoyager's approach
+        # Enhanced system prompt with hover support
         self.system_prompt = """You are an AI assistant that helps users interact with web elements.
 Your task is to understand the user's intent and generate precise web element interactions.
 
 For each task, analyze:
-1. The user's goal and required interaction (click, type, scroll, wait)
+1. The user's goal and required interaction (click, type, scroll, wait, hover)
 2. The target element's properties and accessibility
 3. Any constraints or special conditions
 
@@ -29,22 +29,32 @@ Key Guidelines:
 3. Handle dynamic content and loading states
 4. Pay attention to timing and wait states
 5. Validate success criteria for each interaction
+6. For hover actions:
+   - Ensure element is visible and interactable
+   - Consider dynamic content (dropdowns, tooltips)
+   - Validate hover effects and state changes
 
 Generate interactions in this JSON format:
 {
-    "action": "click|type|scroll|wait",
+    "action": "click|type|scroll|wait|hover",
     "selector_type": "css|xpath|id",
     "selector_value": "string",
     "input_text": "string",  # For type actions
     "wait_time": integer,    # For wait actions in seconds
     "scroll_direction": "up|down",  # For scroll actions
+    "hover_duration": integer,  # For hover actions in milliseconds
     "validation": {
-        "expected_state": "visible|hidden|text_present|text_absent",
+        "expected_state": "visible|hidden|text_present|text_absent|hover_effect",
         "validation_selector": "string",  # Element to validate
-        "expected_text": "string"  # For text validation
+        "expected_text": "string",  # For text validation
+        "hover_effects": {  # For hover validation
+            "type": "tooltip|dropdown|style_change",
+            "target_selector": "string",  # Element affected by hover
+            "expected_changes": ["color_change", "visibility", "content"]
+        }
     }
 }"""
-
+        
     def _call_api(self, prompt: str, retry_count: int = 0) -> Tuple[Optional[str], bool]:
         """Helper method to call Gemini API with retry logic."""
         try:
@@ -79,6 +89,7 @@ Consider:
 1. Is this a multi-step interaction?
 2. Are there any loading or dynamic states to handle?
 3. What validation should be performed?
+4. For hover: what effects should we validate?
 
 Generate the optimal web interaction instruction as a JSON object."""
 
@@ -99,9 +110,7 @@ Generate the optimal web interaction instruction as a JSON object."""
                     selector_type=interaction_data.get('selector_type', task['target_element']['type']),
                     selector_value=interaction_data.get('selector_value', task['target_element']['value']),
                     input_text=interaction_data.get('input_text'),
-                    description=task['task'],
-                    wait_time=interaction_data.get('wait_time', 0),
-                    validation=interaction_data.get('validation', {})
+                    description=task['task']
                 )
         except Exception as e:
             print(f"Error parsing Gemini response: {str(e)}")
@@ -129,7 +138,8 @@ Analyze the error and suggest a solution considering:
 1. Is this a timing/loading issue?
 2. Is the selector still valid?
 3. Is the element interactive?
-4. Are there any prerequisite steps missing?
+4. For hover: is the element hoverable?
+5. Are there any prerequisite steps missing?
 
 Generate a modified interaction as a JSON object or respond with "GIVE UP" if unrecoverable."""
 
@@ -154,9 +164,7 @@ Generate a modified interaction as a JSON object or respond with "GIVE UP" if un
                     selector_type=interaction_data['selector_type'],
                     selector_value=interaction_data['selector_value'],
                     input_text=interaction_data.get('input_text'),
-                    description=f"Error recovery: {task['task']}",
-                    wait_time=interaction_data.get('wait_time', 0),
-                    validation=interaction_data.get('validation', {})
+                    description=f"Error recovery: {task['task']}"
                 )
         except Exception as e:
             print(f"Error in error handling: {str(e)}")
@@ -179,7 +187,8 @@ Evaluate the interaction success based on:
 1. Element state changes (visibility, content, attributes)
 2. Page state changes (URL, dynamic content)
 3. Error messages or warnings
-4. Expected outcomes from validation rules
+4. For hover: validate expected hover effects
+5. Expected outcomes from validation rules
 
 Respond with:
 - "YES" if all success criteria are met

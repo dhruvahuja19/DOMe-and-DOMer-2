@@ -14,26 +14,24 @@ class WebInteraction:
 
 @dataclass
 class TaskResult:
-    """Represents the result of executing a task."""
+    """Class to store task execution results"""
     task_id: str
     success: bool
-    before_screenshot: Optional[str] = None
-    after_screenshot: Optional[str] = None
-    html_element: Optional[str] = None
-    accessibility_tree: Optional[Dict[str, Any]] = None
     error: Optional[str] = None
+    html_element: Optional[str] = None
+    after_screenshot: Optional[str] = None
+    accessibility_tree: Optional[Dict[str, Any]] = None
     metadata: Optional[Dict[str, Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary for serialization."""
+        """Convert to dictionary format"""
         return {
             "task_id": self.task_id,
             "success": self.success,
-            "before_screenshot": self.before_screenshot,
-            "after_screenshot": self.after_screenshot,
-            "html_element": self.html_element,
-            "accessibility_tree": self.accessibility_tree,
             "error": self.error,
+            "html_element": self.html_element,
+            "after_screenshot": self.after_screenshot,
+            "accessibility_tree": self.accessibility_tree,
             "metadata": self.metadata
         }
 

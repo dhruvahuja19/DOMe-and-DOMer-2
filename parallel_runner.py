@@ -1,6 +1,5 @@
 import os
 import time
-import logging
 import queue
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -9,8 +8,16 @@ from pathlib import Path
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import (
+    TimeoutException, 
+    ElementNotInteractableException,
+    StaleElementReferenceException,
+    ElementClickInterceptedException
+)
 from utils import (
     execute_interaction,
     save_screenshot,
@@ -23,6 +30,7 @@ class TaskRunner:
     """Handles parallel execution of benchmark tasks"""
     
     def __init__(self, 
+                 model,
                  max_workers: int = 4,
                  output_dir: Path = None,
                  save_accessibility_tree: bool = True,
@@ -31,11 +39,13 @@ class TaskRunner:
         Initialize TaskRunner
         
         Args:
+            model: Language model to use for task parsing
             max_workers: Maximum number of concurrent Chrome instances
             output_dir: Directory for results and screenshots
             save_accessibility_tree: Whether to save accessibility trees
             wait_time: Wait time between actions in seconds
         """
+        self.model = model
         self.max_workers = max_workers
         self.output_dir = output_dir or Path("results")
         self.save_accessibility_tree = save_accessibility_tree
@@ -44,33 +54,32 @@ class TaskRunner:
         # Create output directory
         self.output_dir.mkdir(parents=True, exist_ok=True)
         
-        # Setup logging
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(levelname)s - %(message)s',
-            handlers=[
-                logging.FileHandler(self.output_dir / "benchmark.log"),
-                logging.StreamHandler()
-            ]
-        )
-        
         # Thread-safe queue for results
         self.results_queue = queue.Queue()
     
-    def setup_driver(self) -> webdriver.Chrome:
+    def setup_driver(self):
         """Create and configure Chrome WebDriver instance"""
         chrome_options = Options()
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
         chrome_options.add_argument('--force-device-scale-factor=1')
         chrome_options.add_argument('--window-size=1920,1080')
+        chrome_options.add_argument('--disable-gpu')   # Disable GPU hardware acceleration
+        chrome_options.add_argument('--start-maximized')  # Start maximized
+        chrome_options.add_argument('--disable-extensions')  # Disable extensions
+        chrome_options.add_argument('--disable-popup-blocking')  # Disable popup blocking
         chrome_options.add_argument(
-            'user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 '
-            '(KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36'
+            'user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
+            'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.6778.140 Safari/537.36'
         )
         
-        service = Service(ChromeDriverManager().install())
-        return webdriver.Chrome(service=service, options=chrome_options)
+        # Use Selenium Manager instead of ChromeDriverManager
+        service = Service()
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+        
+        # Navigate to about:blank first to ensure a clean start
+        driver.get("about:blank")
+        return driver
     
     def execute_task(self, task: Dict[str, Any]) -> Dict[str, Any]:
         """Execute a single benchmark task"""
@@ -88,18 +97,12 @@ class TaskRunner:
             driver = self.setup_driver()
             
             # Navigate to page
-            url = task.get('web')
+            url = task.get('web')  # Changed from 'url' to 'web' to match task data
             if not url:
                 raise ValueError("No URL provided in task")
                 
-            logging.info(f"Task {task_id}: Navigating to {url}")
             driver.get(url)
             time.sleep(self.wait_time)
-            
-            # Save before screenshot
-            before_screenshot = self.output_dir / f"{task_id}_before.png"
-            save_screenshot(driver, str(before_screenshot))
-            result['before_screenshot'] = str(before_screenshot)
             
             # Save accessibility tree before interaction
             if self.save_accessibility_tree:
@@ -109,15 +112,22 @@ class TaskRunner:
                 result['before_tree'] = str(before_tree_path)
             
             # Execute interaction
+            web_interaction = self.model.parse_task(task)
             interaction = {
-                "action": task.get("interaction", "click"),
-                "selector": f"{task['target_element']['type']}={task['target_element']['value']}" if task.get('target_element') else "",
-                "value": task.get("input_text", "")
+                'action': web_interaction.action,
+                'target_element': {
+                    'type': web_interaction.selector_type,
+                    'value': web_interaction.selector_value
+                },
+                'input_text': web_interaction.input_text
             }
             
-            success, element_html = execute_interaction(driver, interaction)
-            result['success'] = success
-            result['html_element'] = element_html
+            interaction_result = execute_interaction(driver, interaction['action'], interaction['target_element'], interaction['input_text'])
+            if interaction_result['success']:
+                result['success'] = True
+                result['html_element'] = interaction_result['html_element']
+            else:
+                result['error'] = interaction_result['error']
             time.sleep(self.wait_time)
             
             # Save after screenshot
@@ -134,7 +144,6 @@ class TaskRunner:
             
         except Exception as e:
             result['error'] = str(e)
-            logging.error(f"Error in task {task_id}: {str(e)}", exc_info=True)
             
         finally:
             if driver:
@@ -146,28 +155,128 @@ class TaskRunner:
         """Run tasks in parallel using ThreadPoolExecutor"""
         results = []
         
-        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
-            # Submit all tasks
-            future_to_task = {
-                executor.submit(self.execute_task, task): task
-                for task in tasks
-            }
+        # Process tasks in smaller batches to avoid overwhelming the system
+        batch_size = min(self.max_workers, 20)  # Process at most 5 tasks at a time
+        for i in range(0, len(tasks), batch_size):
+            batch = tasks[i:i + batch_size]
             
-            # Process completed tasks
-            for future in as_completed(future_to_task):
-                task = future_to_task[future]
-                try:
-                    result = future.result()
-                    results.append(result)
-                    logging.info(f"Completed task {task.get('id', 'unknown')}")
-                except Exception as e:
-                    logging.error(f"Task failed: {str(e)}", exc_info=True)
+            with ThreadPoolExecutor(max_workers=batch_size) as executor:
+                # Submit batch of tasks
+                future_to_task = {
+                    executor.submit(self.execute_task, task): task
+                    for task in batch
+                }
+                
+                # Process completed tasks
+                for future in as_completed(future_to_task):
+                    task = future_to_task[future]
+                    task_id = task.get('id', 'unknown')
+                    try:
+                        result = future.result(timeout=120)  # 2 minute timeout per task
+                        results.append(result)
+                    except Exception as e:
+                        error_msg = f"Task {task_id} failed with error: {str(e)}"
+                        results.append({
+                            'task_id': task_id,
+                            'success': False,
+                            'error': error_msg,
+                            'task_description': task.get('task'),
+                            'timestamp': time.time()
+                        })
+            
+            # Add a small delay between batches
+            if i + batch_size < len(tasks):
+                time.sleep(1)
         
         return results
+
+def execute_interaction(driver, interaction_type, target_element, input_text=None, timeout=10):
+    """Execute a single interaction with better error handling and logging"""
+    selector_type = target_element.get("type")
+    selector_value = target_element.get("value")
+    result = {
+        "success": False,
+        "html_element": None,
+        "error": None
+    }
+    
+    selector_map = {
+        "id": By.ID,
+        "class": By.CLASS_NAME,
+        "text": By.LINK_TEXT,
+        "css": By.CSS_SELECTOR,
+        "xpath": By.XPATH
+    }
+    
+    try:
+        by_type = selector_map.get(selector_type)
+        if not by_type:
+            raise ValueError(f"Invalid selector type: {selector_type}")
+            
+        wait = WebDriverWait(driver, timeout)
+        
+        # First wait for presence
+        element = wait.until(
+            EC.presence_of_element_located((by_type, selector_value))
+        )
+        
+        # Store HTML as soon as we find the element
+        result["html_element"] = element.get_attribute('outerHTML')
+        
+        # Different wait conditions based on interaction type
+        if interaction_type in ["type", "type_submit"]:
+            element = wait.until(
+                EC.and_((
+                    EC.visibility_of_element_located((by_type, selector_value)),
+                    EC.element_to_be_clickable((by_type, selector_value))
+                ))
+            )
+        else:
+            element = wait.until(
+                EC.element_to_be_clickable((by_type, selector_value))
+            )
+            driver.execute_script("arguments[0].scrollIntoView(true);", element)
+            time.sleep(0.5)
+        
+        # Execute interaction based on type
+        if interaction_type == "click":
+            try:
+                element.click()
+            except ElementClickInterceptedException:
+                driver.execute_script("arguments[0].click();", element)
+        elif interaction_type == "type":
+            element.clear()
+            element.send_keys(input_text)
+        elif interaction_type == "type_submit":
+            element.clear()
+            element.send_keys(input_text)
+            element.send_keys(Keys.RETURN)
+        else:
+            raise ValueError(f"Invalid interaction type: {interaction_type}")
+            
+        result["success"] = True
+        return result
+        
+    except TimeoutException:
+        result["error"] = f"Element not found: {selector_type}={selector_value}"
+        return result
+    except ElementNotInteractableException:
+        result["error"] = f"Element not interactable: {selector_type}={selector_value}"
+        return result
+    except StaleElementReferenceException:
+        result["error"] = f"Element became stale: {selector_type}={selector_value}"
+        return result
+    except ElementClickInterceptedException:
+        result["error"] = f"Click blocked: {selector_type}={selector_value}"
+        return result
+    except Exception as e:
+        result["error"] = str(e)
+        return result
 
 def run_parallel_benchmark(
     tasks_file: str,
     output_dir: str,
+    model,
     max_workers: int = 4,
     save_accessibility_tree: bool = True,
     wait_time: float = 2.0
@@ -178,6 +287,7 @@ def run_parallel_benchmark(
     Args:
         tasks_file: Path to JSONL file containing tasks
         output_dir: Directory for results and screenshots
+        model: Language model to use for task parsing
         max_workers: Maximum number of concurrent Chrome instances
         save_accessibility_tree: Whether to save accessibility trees
         wait_time: Wait time between actions in seconds
@@ -187,10 +297,10 @@ def run_parallel_benchmark(
     """
     # Load tasks
     tasks = load_tasks_with_ground_truth(tasks_file)
-    logging.info(f"Loaded {len(tasks)} tasks")
     
     # Initialize runner
     runner = TaskRunner(
+        model=model,
         max_workers=max_workers,
         output_dir=Path(output_dir),
         save_accessibility_tree=save_accessibility_tree,

@@ -1,0 +1,2482 @@
+[
+  {
+    "task_id": "imdb_search_102",
+    "success": false,
+    "error": "module 'selenium.webdriver.support.expected_conditions' has no attribute 'and_'",
+    "task_description": "Click the search box and type 'Inception'",
+    "timestamp": 1734493019.657591,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/imdb_search_102_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The expected outcome was for the agent to click the search box and type 'Inception' on the IMDb website, which should bring up search results related to the movie 'Inception'. The first image shows the correct behavior with 'Inception' typed into the search box and associated content displayed. However, the second image does not show the search box or any content related to 'Inception', indicating that the task was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected and actual HTML elements match perfectly. They are both input elements of type text, with the same attributes including id, class, and accessibility attributes. The placeholder and aria-label also match, indicating that they serve the same purpose. The value attribute is empty in both cases, which is expected for a search box before any input is entered. Therefore, these elements would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "stackoverflow_nav_104",
+    "success": true,
+    "error": null,
+    "task_description": "Click the Questions link in the navigation",
+    "timestamp": 1734493019.6577191,
+    "html_element": "<a id=\"nav-questions\" href=\"/questions\" class=\"s-block-link pl8 js-gps-track nav-links--link -link__with-icon\" data-gps-track=\"top_nav.click({is_current: false, location:1, destination:1,  has_activity_notification:False})\" aria-controls=\"\" data-controller=\" \" data-s-popover-placement=\"right\" aria-current=\"false\" data-s-popover-auto-show=\"true\" data-s-popover-hide-on-outside-click=\"never\">\n        <div class=\"d-flex ai-center\">\n<svg aria-hidden=\"true\" class=\"svg-icon iconQuestion\" width=\"18\" height=\"18\" viewBox=\"0 0 18 18\"><path d=\"m4 15-3 3V4c0-1.1.9-2 2-2h12c1.09 0 2 .91 2 2v9c0 1.09-.91 2-2 2zm7.75-3.97c.72-.83.98-1.86.98-2.94 0-1.65-.7-3.22-2.3-3.83a4.4 4.4 0 0 0-3.02 0 3.8 3.8 0 0 0-2.32 3.83q0 1.93 1.03 3a3.8 3.8 0 0 0 2.85 1.07q.94 0 1.71-.34.97.66 1.06.7.34.2.7.3l.59-1.13a5 5 0 0 1-1.28-.66m-1.27-.9a5 5 0 0 0-1.5-.8l-.45.9q.5.18.98.5-.3.1-.65.11-.92 0-1.52-.68c-.86-1-.86-3.12 0-4.11.8-.9 2.35-.9 3.15 0 .9 1.01.86 3.03-.01 4.08\"></path></svg>                <span class=\"-link--channel-name pl6\">Questions</span>\n\n        </div>\n    </a>",
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/stackoverflow_nav_104_after.png",
+    "final_score": 1.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 1.0,
+        "explanation": "{\n  \"correctness\": true,\n  \"reason\": \"The agent successfully completed the task of clicking the 'Questions' link in the navigation. In both the expected and output images, we see the 'Questions' page on Stack Overflow with the heading 'Newest Questions', verifying that the link was clicked and the correct page was reached.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML element is an anchor tag (<a>) which is the correct element for a navigation link. The expected HTML element is a span tag, which is not typically used for navigation links. The actual HTML element has an id attribute of \"nav-questions\" which can be used for targeting the element, and a href attribute that points to \"/questions\", which is the expected behavior for a navigation link. The content of the actual HTML element includes a span with the text \"Questions\", which matches the expected content. The actual HTML element also includes accessibility attributes such as aria-controls, data-controller, and aria-current, which are not present in the expected HTML element but enhance the accessibility of the element. Therefore, the actual HTML element matches the expected functionality and purpose, even though the expected HTML element is not the correct element for this task."
+      }
+    }
+  },
+  {
+    "task_id": "gutenberg_browse_115",
+    "success": false,
+    "error": "Element not found: id=browse-catalog",
+    "task_description": "Click the Browse Catalog link",
+    "timestamp": 1734493019.669357,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/gutenberg_browse_115_after.png",
+    "final_score": 0.8,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 1.0,
+        "explanation": "{\n  \"correctness\": true,\n  \"reason\": \"The task was to click on the 'Browse Catalog' link. The output image shows the Project Gutenberg homepage with sections featuring a selection of free eBooks, which is different from the search page in the first image. This change indicates that the 'Browse Catalog' link has been successfully clicked and the browser has navigated to the expected page, displaying various book categories and featured eBooks.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: The expected HTML element does not match the actual HTML element in terms of content and inner HTML. The task specifies that the user should be able to click the \"Browse Catalog\" link, but the actual HTML element provides a \"Search and Browse\" link. Therefore, the content does not serve the same purpose as expected. The element types and attributes match, but the content does not, so the elements do not match overall."
+      }
+    }
+  },
+  {
+    "task_id": "gutenberg_search_111",
+    "success": false,
+    "error": "Element not found: id=mainsearch",
+    "task_description": "Type 'Shakespeare' in the search box",
+    "timestamp": 1734493019.666519,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/gutenberg_search_111_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to type 'Shakespeare' in the search box on the website. The expected output should display a search results page showing books and materials related to Shakespeare. The second image shows the main homepage of the website without any indication that the search for 'Shakespeare' was performed. The search box is empty and no search results are visible, indicating that the task was not completed as specified.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML element matches the expected HTML element perfectly. Both are input elements of type text, with the same id, class, title, tabindex, size, maxlength, and placeholder attributes. There is no difference in content or inner HTML, and the role and accessibility attributes are the same. Therefore, the functionality and purpose of these elements are identical."
+      }
+    }
+  },
+  {
+    "task_id": "pubmed_search_122",
+    "success": false,
+    "error": "Element not found: id=id-term",
+    "task_description": "Type 'cancer research' in the search box and press search",
+    "timestamp": 1734493019.6731882,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/pubmed_search_122_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task specified that the agent should type 'cancer research' in the search box and press search. The expected result image shows that the search was indeed performed, displaying search results for 'cancer research' with a list of relevant articles and total results. However, the second image, which is the output of the agent's action, shows the PubMed home page without any search having been performed, indicated by the absence of any text in the search box and lack of search results. Therefore, the task was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected and actual HTML elements match perfectly. They are both input elements of type \"search\" with the same attributes, including the same class, id, and accessibility attributes. This means they would function in the same way, allowing users to type 'cancer research' into the search box and submit their query."
+      }
+    }
+  },
+  {
+    "task_id": "soundcloud_legal_118",
+    "success": false,
+    "error": "Element not found: id=legal-link",
+    "task_description": "Click the Legal link in the footer",
+    "timestamp": 1734493019.671985,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/soundcloud_legal_118_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click the 'Legal' link in the footer, which should lead to a page that shows legal-related content, such as 'Terms of Use', 'Privacy Policy', etc. The expected image shows the 'SoundCloud Terms of Use' page, which is appropriate as this might be one of the pages under 'Legal'. However, the output image is still showing the homepage of SoundCloud, indicating that the 'Legal' link was not successfully clicked or did not direct to the correct content.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected and actual HTML elements match perfectly. They are both anchor ('a') tags, which are typically used for links. The class, href, and title attributes are identical, meaning they would have the same styling and lead to the same destination when clicked. The visible text ('Legal') is also the same. There are no explicit role or accessibility attributes, but anchor tags are inherently accessible and interactive, so this should not be an issue. Therefore, the actual HTML would function the same way as the expected HTML for users."
+      }
+    }
+  },
+  {
+    "task_id": "soundcloud_upload_120",
+    "success": true,
+    "error": "Element not found: id=upload-button",
+    "task_description": "Click the Upload button",
+    "timestamp": 1734493019.672576,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/soundcloud_upload_120_after.png",
+    "final_score": 1.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 1.0,
+        "explanation": "{\n  \"correctness\": true,\n  \"reason\": \"The task was to click the Upload button. In the first image, which is the expected scenario, the 'Upload your first track' button is shown on the upload page. The second image, which is the agent's output, correctly displays a changed page scenario post-click, indicating an interaction with a similar button, now showing a 'Upload your own' button on a different promotional section. This transition suggests that the upload button was indeed clicked, leading to navigation or a refresh to a new state in the UI.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected and actual HTML elements match perfectly. They are both anchor ('a') tags with the same href attribute, pointing to \"/upload\". They also share the same class attributes, which means they would be styled the same way and behave the same way in terms of any JavaScript functionality tied to those classes. The inner HTML, \"Upload your own\", is also identical, meaning the button text that users see and interact with is the same. There are no explicit role or accessibility attributes, but as the elements are identical, they would have the same implicit roles and accessibility characteristics."
+      }
+    }
+  },
+  {
+    "task_id": "nasa_nav_107",
+    "success": false,
+    "error": "Element not found: id=nav-missions",
+    "task_description": "Click the Missions link",
+    "timestamp": 1734493019.6653812,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/nasa_nav_107_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click the 'Missions' link. The first image shows the content of the 'Missions' page, which is the expected output. The second image, however, shows a page titled 'For the Benefit of Humanity', which suggests that a different link was clicked or the content on the 'Missions' page has been updated or changed to a different focus, but it does not match the expected 'Missions' page content as shown in the first image.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: The expected and actual HTML elements do match in terms of element type, content, and lack of key attributes. However, neither of them is correct for the specified task. The task requires a clickable link, which should be represented by an <a> tag in HTML, not a <span> tag. A <span> tag is a generic inline container for phrasing content and does not provide any clickable functionality. Therefore, the actual HTML does not match the expected functionality."
+      }
+    }
+  },
+  {
+    "task_id": "tripadvisor_search_101",
+    "success": false,
+    "error": "Element not found: id=mainSearch",
+    "task_description": "Type 'Paris hotels' in the search box and press search",
+    "timestamp": 1734493019.657429,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/tripadvisor_search_101_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to type 'Paris hotels' in the search box and press search. The second image shows the TripAdvisor homepage with an empty search field, indicating that 'Paris hotels' was not typed into the search box, nor was the search executed as required. The expected result should display a page with listings or results related to hotels in Paris, similar to the first image.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML element matches the expected HTML element perfectly. Both are input elements of type \"search\" with the same attributes, including accessibility attributes such as role, aria-label, aria-controls, and aria-autocomplete. The class names, placeholder text, and other attributes are also identical. Therefore, the actual element would function the same way as the expected element for users, allowing them to type 'Paris hotels' in the search box and press search."
+      }
+    }
+  },
+  {
+    "task_id": "npr_menu_105",
+    "success": false,
+    "error": "Element not found: id=menu-button",
+    "task_description": "Click the Culture button in the navigation menu",
+    "timestamp": 1734493019.658232,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/npr_menu_105_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The agent was supposed to click the 'Culture' button in the navigation menu. The expected outcome, as shown in the first image, should display the Culture section of the NPR website with various cultural topics and related articles. However, the second image displays the Politics section instead, indicating that the agent did not successfully navigate to the Culture section as intended.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. Both are anchor ('a') elements with the same href attribute, pointing to the \"culture\" section of the website. The data-metrics-ga4 attribute, which is likely used for tracking user interactions, is also identical in both elements. The visible text within the element, \"Culture\", is the same in both cases. Therefore, the element types, essential attributes, content, and functionality all match."
+      }
+    }
+  },
+  {
+    "task_id": "imdb_trailers_123",
+    "success": true,
+    "error": null,
+    "task_description": "Click the trailers link",
+    "timestamp": 1734493019.674639,
+    "html_element": "<a href=\"/trailers/?ref_=hm_hp_sm\" class=\"sc-5d356059-6 kHzcM example-headline6\">Browse trailers<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" class=\"ipc-icon ipc-icon--chevron-right chevron-right\" viewBox=\"0 0 24 24\" fill=\"currentColor\" role=\"presentation\"><path fill=\"none\" d=\"M0 0h24v24H0V0z\"></path><path d=\"M9.29 6.71a.996.996 0 0 0 0 1.41L13.17 12l-3.88 3.88a.996.996 0 1 0 1.41 1.41l4.59-4.59a.996.996 0 0 0 0-1.41L10.7 6.7c-.38-.38-1.02-.38-1.41.01z\"></path></svg></a>",
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/imdb_trailers_123_after.png",
+    "final_score": 1.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 1.0,
+        "explanation": "{\n  \"correctness\": true,\n  \"reason\": \"The task was to click the trailers link and both images show the page titled 'Watch New Movie & TV Trailers,' indicating that the trailers link was successfully clicked. Both images display a variety of trailers with their respective images, indicating that the agent's output matches the expected result.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. Both are anchor ('a') elements with the same href attribute, which means they link to the same URL. They also have the same class attribute, which means they will be styled the same way. The inner HTML, including the SVG element, is also identical, which means they will look the same to users. There are no role or accessibility attributes specified, but since the elements are identical, they would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "nasa_images_114",
+    "success": false,
+    "error": "Element not found: id=images-link",
+    "task_description": "Click the Multimedia link",
+    "timestamp": 1734493019.669211,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/nasa_images_114_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click the 'Multimedia' link. The first image shows the Multimedia tab selected with a dropdown menu displaying various multimedia options, suggesting that 'Multimedia' has been clicked. The second image, however, does not show the Multimedia dropdown menu, and the content displayed is different, instead focusing on 'For the Benefit of Humanity'. This indicates that the action of clicking the 'Multimedia' link was not successfully completed in the second image.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types are both 'button', the classes, aria attributes, and other key attributes are identical. The content, including the inner HTML, is the same in both the expected and actual HTML. The role and accessibility attributes are also the same, meaning the button would function the same way for users. Therefore, the actual HTML element matches the expected element in functionality and purpose."
+      }
+    }
+  },
+  {
+    "task_id": "nasa_search_106",
+    "success": false,
+    "error": "Element not found: id=nasa-search",
+    "task_description": "Type 'space station' in the search box and press search",
+    "timestamp": 1734493019.661951,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/nasa_search_106_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The agent was expected to type 'space station' in the search box and press search, leading to a search results page for 'space station'. The expected image shows that the search was executed successfully with 24096 results for 'space station'. However, the output image shows the homepage of the website without any evidence that a search was conducted, as there is no search results page displayed. Thus, the task was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types are the same (input), the key attributes such as class, id, type, name, value, and placeholder are identical. There is no content or inner HTML to consider in this case, and no specific role or accessibility attributes are mentioned, but as a search input field, it is inherently accessible. Therefore, the element would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "npr_podcasts_112",
+    "success": false,
+    "error": "Element not found: id=podcasts-link",
+    "task_description": "Click the Podcasts link",
+    "timestamp": 1734493019.6686132,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/npr_podcasts_112_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click the 'Podcasts' link, but the second image does not show the 'NPR Podcasts & Shows' page as expected. Instead, it displays a page with news and political content, indicating the click was not performed correctly or landed on the wrong page.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. Both are anchor ('a') tags, which are typically used for links. The href attributes match, meaning they would direct the user to the same location. The data-metrics-ga4 attributes also match, indicating that they would track the same user interaction. The visible text within the tags is the same, so the user experience would be identical. There are no differences in accessibility attributes. Therefore, the actual HTML would function the same way as the expected HTML for users."
+      }
+    }
+  },
+  {
+    "task_id": "npr_stations_119",
+    "success": false,
+    "error": "Element not found: id=stations-link",
+    "task_description": "Click the newsletter button and enter johndoe@email.com",
+    "timestamp": 1734493019.672329,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/npr_stations_119_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click the newsletter button and enter the email 'johndoe@email.com'. While the first image shows that the email has been entered into the appropriate field on the newsletter sign-up page, the second image indicates that the agent navigated away from the newsletter page and does not depict the completion of signing up for the newsletter. Therefore, the task was not completed as specified.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. Both the anchor tag and the input tag are present with the same attributes. The anchor tag has the correct href attribute, data-metrics-ga4 attribute, and target attribute. The input tag has the correct id and type attributes. The placeholder attribute is also the same. The content of the anchor tag is the same. Therefore, the functionality and purpose of the actual HTML would be the same as the expected HTML."
+      }
+    }
+  },
+  {
+    "task_id": "nasa_astronomy_121",
+    "success": false,
+    "error": "Element not found: id=astronomy-link",
+    "task_description": "Click the Nasa youtube channel button",
+    "timestamp": 1734493019.672769,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/nasa_astronomy_121_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The agent was supposed to click on the NASA YouTube channel button, but the output image shows that the agent has navigated to a different website, presumably NASA's official site. The YouTube interface from the expected image is not visible in the output, indicating the task was not completed as specified.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. Both are anchor ('a') elements with the same href attribute pointing to the NASA YouTube channel. The title attribute is also the same, providing additional information about the link. The target attribute is set to \"_blank\", which means the link will open in a new tab or window. The inner HTML, which is an SVG representing the YouTube logo, is also identical. There are no id or class attributes, but these are not always necessary. The role attribute is set to \"presentation\", which is appropriate for an SVG that is purely decorative. The alt attribute for the SVG is \"YouTube\", which is appropriate and accessible. Therefore, the elements match in functionality and purpose."
+      }
+    }
+  },
+  {
+    "task_id": "imdb_top_116",
+    "success": false,
+    "error": "Element not found: id=top-250-link",
+    "task_description": "Click the Menu link",
+    "timestamp": 1734493019.6713831,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/imdb_top_116_after.png",
+    "final_score": 0.8,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 1.0,
+        "explanation": "{\n  \"correctness\": true,\n  \"reason\": \"The task was to click the 'Menu' link. In the first image (expected image), the Menu appears unclicked, showing categories like 'Movies', 'TV Shows', etc. In the second image (agent's output), the Menu is visibly clicked as indicated by the layout change that now presents a homepage view with sliding banners for films and shows, and video content sections, suggesting the Menu has been expanded to display different content options. Thus, the task of clicking the Menu link has been successfully completed.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: The expected and actual HTML elements do match in terms of element type, key attributes, and content. However, neither of them is correct for the specified task. The task requires a clickable element, which is typically represented by an <a> or <button> tag in HTML. The <span> tag is not inherently interactive and does not provide the necessary semantics for assistive technologies. Therefore, it would not function the same way for users, especially those using screen readers or other assistive tools."
+      }
+    }
+  },
+  {
+    "task_id": "imdb_nav_109",
+    "success": false,
+    "error": "Element not found: id=signin-button",
+    "task_description": "Click the Sign In button",
+    "timestamp": 1734493019.666021,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/imdb_nav_109_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click the 'Sign In' button, but based on the screenshots, it appears that the task was not completed as specified. The second screenshot shows a general IMDb page with featured content and trailers, suggesting the user did not proceed to a sign-in related page or the sign-in process itself, which would typically lead to a personalized homepage or continue to a user authentication step.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: The provided HTML elements are both span tags with the same class and inner HTML. However, a span tag is not interactive and cannot be clicked like a button. The expected HTML for a clickable Sign In button should be a button or an anchor tag. The span tag does not provide the functionality required for the task. Therefore, the actual HTML does not match the expected HTML in terms of functionality."
+      }
+    }
+  },
+  {
+    "task_id": "weather_search_103",
+    "success": false,
+    "error": "module 'selenium.webdriver.support.expected_conditions' has no attribute 'and_'",
+    "task_description": "Enter 'Miami' into the location search box",
+    "timestamp": 1734493019.6576571,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/weather_search_103_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to enter 'Miami' into the location search box on the weather website. The first image shows the expected result with 'Miami' entered into the search box and related location suggestions displayed. The second image fails to show 'Miami' in the search box, and no action appears to have been taken in line with the task, as the screen still displays the default content and location (Berkeley, CA). Therefore, the task was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected and actual HTML elements are identical. They are both input elements with the same attributes, including the role of \"combobox\" and the id of \"LocationSearch_input\". The placeholder text is the same, indicating that they serve the same purpose of allowing users to search for a city or zip code. The autocomplete and autocapitalize attributes are both set to \"off\", and the aria-autocomplete attribute is set to \"list\", indicating that they would function the same way for users. The value attribute is empty in both elements, which is expected for a search box before the user has entered anything. Therefore, the actual HTML element matches the expected element in functionality and purpose."
+      }
+    }
+  },
+  {
+    "task_id": "weather_unit_110",
+    "success": false,
+    "error": "Element not found: id=unit-toggle",
+    "task_description": "Click the temperature unit toggle",
+    "timestamp": 1734493019.666336,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/weather_unit_110_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click the temperature unit toggle from Fahrenheit to Celsius or vice versa. In the first image (expected), the temperature unit toggle shows '\u00b0F' as the active selection. In the second image (agent's output), the temperature unit still shows '\u00b0F' as the active selection, indicating that the toggle was not clicked or the toggle action did not change the temperature unit as expected.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected and actual HTML elements match perfectly. They are both 'span' elements with the same class attribute \"LanguageSelector--unitDisplay--8FGMs\". The content inside the elements is also the same, \"\u00b0F\", which indicates the temperature unit. There are no role and accessibility attributes specified, but since the elements are identical, they would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "gutenberg_popular_125",
+    "success": false,
+    "error": "Element not found: xpath=//text()[contains(.,'Popular')]/ancestor::button[1]",
+    "task_description": "Click the ibiblio button",
+    "timestamp": 1734493132.974273,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/gutenberg_popular_125_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The agent was expected to click on the 'ibiblio' button which should reveal content specifically related to the 'ibiblio' site. However, the second image shows the 'Project Gutenberg' website, which is mentioned in the first image as one of the avenues through which poetry can be accessed via 'ibiblio'. The agent seems to have misinterpreted the task by clicking on an internal link related to Project Gutenberg within ibiblio.org, instead of simply showcasing or focusing on 'ibiblio' website elements or functionalities.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types are the same, being an anchor tag (<a>) wrapping an image tag (<img>). The key attributes such as href, title, src, and alt are identical in both the expected and actual HTML. The content, which is an image in this case, serves the same purpose in both instances. The role and accessibility attributes are also the same, with the title attribute providing additional information about the link and the alt attribute providing alternative text for the image. Therefore, the element would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "nasa_solar_142",
+    "success": false,
+    "error": "Element not found: id=solar-system-link",
+    "task_description": "Click the Solar System link",
+    "timestamp": 1734493132.9930408,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/nasa_solar_142_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click on the 'Solar System' link, which should result in a page that prominently discusses Solar System Exploration. The expected output image shows a webpage titled 'Solar System Exploration'. However, the agent's output is a webpage titled 'For the Benefit of Humanity', which is different from the expected output. Hence, the task was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected and actual HTML elements match perfectly. They are both anchor ('a') tags, which are used for creating hyperlinks. The href attribute, which specifies the URL of the page the link goes to, is the same in both. The inner HTML, which is the clickable part of the link, is also identical in both. There are no id, class, role, or accessibility attributes specified, so there's nothing to compare there, but the absence of these attributes doesn't affect the basic functionality of the link. Therefore, the actual HTML would function the same way for users as the expected HTML."
+      }
+    }
+  },
+  {
+    "task_id": "gutenberg_books_143",
+    "success": false,
+    "error": "Element not found: id=nav-books-link",
+    "task_description": "Click the random books link",
+    "timestamp": 1734493132.9940228,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/gutenberg_books_143_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The expected image shows a page with a list of books displayed under the title 'All Books (in random order)', confirming that the 'Random Books' link was clicked and the page correctly loaded with books listed in random order. The agent's output, however, shows only the main search page with options to select different book categories, including a 'Random' books link, but it does not show the page after the link has actually been clicked. Instead, it appears to merely highlight the link, indicating the task of clicking and loading the random books page was not completed.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML element matches the expected HTML element perfectly. The element types are the same, all key attributes including class, href, and accesskey are identical, and the content and inner HTML are also the same. The role and accessibility attributes are also identical, meaning the element would function the same way for users. Therefore, the actual HTML element matches the expected functionality and purpose."
+      }
+    }
+  },
+  {
+    "task_id": "gutenberg_books_144",
+    "success": false,
+    "error": "Element not found: id=donate-button",
+    "task_description": "Click the ways to donate button",
+    "timestamp": 1734493132.9944608,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/gutenberg_books_144_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The agent was supposed to click the 'Ways to donate' button. The second image does not reflect this action. Instead, it shows the home page of Project Gutenberg without any indication that the 'Ways to donate' button has been clicked, such as a donation page or a confirmation message. Therefore, the task of clicking the 'Ways to donate' button was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types are the same, being the 'a' tag which is used for links. The key attribute, in this case the href attribute, is also the same, pointing to the \"/donate/\" page. The content and inner HTML are identical, both displaying the text \"Ways to donate\". There are no specific role or accessibility attributes mentioned, but as the actual and expected HTML are the same, we can assume these would be identical as well. Therefore, the element would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "imdb_watchlist_130",
+    "success": false,
+    "error": "Element not found: id=watchlist-button",
+    "task_description": "Click the Watchlist link",
+    "timestamp": 1734493132.9759722,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/imdb_watchlist_130_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click the 'Watchlist' link. The first image shows the sign-in page, indicating the 'Watchlist' link on the IMDb website requires sign-in to access. The second image, claimed to be the agent's output, shows the homepage of the IMDb website without resolution into any specific watchlist details, signifying that the agent has not successfully navigated to or clicked the 'Watchlist' link.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected and actual HTML elements match perfectly. They are both 'span' elements with the same class attribute \"ipc-btn__text\". The content within the tags is also the same, \"Watchlist\", which is expected for the task. There are no role or accessibility attributes provided, but since both elements are identical, they would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "gutenberg_policy_132",
+    "success": true,
+    "error": "Element not found: id=eleventh-item",
+    "task_description": "Find the 11th section in the privacy policy",
+    "timestamp": 1734493132.9771001,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/gutenberg_policy_132_after.png",
+    "final_score": 1.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 1.0,
+        "explanation": "{\n  \"correctness\": true,\n  \"reason\": \"The second image successfully displays the table of contents of the Project Gutenberg Permissions Policy page, wherein the 11th section titled 'US only' is clearly labeled. This confirms that the agent has navigated to the correct section of the document as per the task's requirement.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected and actual HTML elements match perfectly. They are both 'li' elements containing an 'a' element with the same href attribute value \"#us-only\". The content of the 'a' element is also the same in both cases. There are no role or accessibility attributes specified, but since the elements are identical, they would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "npr_about_133",
+    "success": false,
+    "error": "Element not found: id=about-link",
+    "task_description": "Click search and type in uc berkeley",
+    "timestamp": 1734493132.977438,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/npr_about_133_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The expected output shows a search result page on NPR's website for 'uc berkeley' with appropriate search results listed. However, the agent's output displays the NPR homepage without any sign of a search being conducted or results for 'uc berkeley' displayed. Therefore, the task of clicking search and typing 'uc berkeley' was not successfully completed as specified.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. Both the anchor tag and the input tag are present with the same attributes. The anchor tag has the correct href, id, and data-metrics attributes, and the input tag has the correct type, placeholder, autocomplete, autocorrect, autocapitalize, spellcheck, required, maxlength, and class attributes. The content of the anchor tag is also the same. Therefore, the elements would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "soundcloud_keyboard_139",
+    "success": false,
+    "error": "Element not found: id=nav-jobs",
+    "task_description": "Click the three buttons and then click the key board short cuts",
+    "timestamp": 1734493132.979372,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/soundcloud_keyboard_139_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task specified was to click the three buttons and then click the keyboard shortcuts. The expected result shows a pop-up window displaying keyboard shortcuts on SoundCloud, indicating that the shortcuts feature was accessed. However, the output image does not show this pop-up; instead, it displays the main page of SoundCloud with no evidence of interaction with keyboard shortcuts or button clicks, suggesting that the task was not completed as specified.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. Both the element types and their attributes are identical. The content serves the same purpose in both cases, which is to provide a clickable button for \"Settings and more\" and a link for \"Keyboard shortcuts\". The role and accessibility attributes are also the same, ensuring that the elements would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "npr_support_126",
+    "success": false,
+    "error": "Element not found: id=support-link",
+    "task_description": "Click the Support radio button",
+    "timestamp": 1734493132.974411,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/npr_support_126_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click the 'Support' radio button on the website. In the second image, which is supposed to show the result of this action, there is no indication that the 'Support' section has been accessed. The displayed content is related to politics and news headlines rather than support-specific information as visible in the expected image. The necessary UI change that would confirm the Support button was clicked is absent.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: The expected HTML element for the task \"Click the Support radio button\" should be an input element with type attribute set to \"radio\". The actual HTML provided is an anchor tag (<a>), which is used for hyperlinks, not radio buttons. Therefore, the actual HTML does not match the expected HTML in terms of element type, key attributes, and functionality. The anchor tag will not provide the same interaction as a radio button."
+      }
+    }
+  },
+  {
+    "task_id": "imdb_awards_137",
+    "success": false,
+    "error": "Element not found: id=awards-link",
+    "task_description": "Click the Awards & Events link",
+    "timestamp": 1734493132.978446,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/imdb_awards_137_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "Evaluation failed: [Errno 2] No such file or directory: 'evaluation/ground_truth/task_137_gt.png'"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Evaluation failed: [Errno 2] No such file or directory: 'evaluation/ground_truth/task_137_gt.png'"
+      }
+    }
+  },
+  {
+    "task_id": "soundcloud_search_129",
+    "success": true,
+    "error": "Element not found: css=#carousel .carousel-control-next",
+    "task_description": "Go to the other slide in the carousel",
+    "timestamp": 1734493132.975632,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/soundcloud_search_129_after.png",
+    "final_score": 1.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 1.0,
+        "explanation": "{\n  \"correctness\": true,\n  \"reason\": \"The task was to go to the other slide in the carousel. The first image shows a slide featuring the text 'What's next in music is first on SoundCloud' along with images of individuals. The second image shows a different slide with the heading 'Discover more with SoundCloud Go+' indicating a successful transition to another slide in the carousel.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected and actual HTML elements match perfectly. They are both 'div' elements with the same class \"frontHero__carouselNavDot\" and the same style \"background: transparent\". There is no content or inner HTML to compare, but since both are empty, they match in this regard as well. As for role and accessibility attributes, none are specified in either the expected or actual HTML, so they match in this regard as well. Therefore, the actual HTML element should function the same way for users as the expected HTML element."
+      }
+    }
+  },
+  {
+    "task_id": "npr_music_140",
+    "success": false,
+    "error": "Element not found: id=music-link",
+    "task_description": "Click the Music link",
+    "timestamp": 1734493132.9885561,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/npr_music_140_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click the Music link. The expected image shows the NPR Music page, indicating the link was clicked successfully. However, the agent's output image shows the Politics section of NPR, not the Music section. This indicates that the music link was not clicked, and hence the task was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. Both are anchor ('a') tags with the same href attribute, pointing to \"/music/\". The data-metrics-ga4 attribute, which seems to be used for tracking user interactions, is also identical in both. The visible text within the tags is \"Music\", which matches the task description. There are no differences in accessibility attributes. Therefore, the actual HTML would function the same way as the expected HTML for users."
+      }
+    }
+  },
+  {
+    "task_id": "soundcloud_search_127",
+    "success": false,
+    "error": "Element not found: id=search-bar",
+    "task_description": "Type Nav in the search bar and execute search",
+    "timestamp": 1734493132.974539,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/soundcloud_search_127_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The expected result of the task was to type 'Nav' in the search bar and execute the search on SoundCloud, leading to a page that displays search results for 'Nav'. The first image shows that after typing and submitting 'Nav' in the search bar, the relevant search results are displayed. In contrast, the second image shows the SoundCloud homepage without any visible search results for 'Nav', indicating that either the 'Nav' text was not entered into the search bar, or the search was not executed. Thus, the task was not completed successfully as the agent\u2019s output does not match the expected result.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML element matches the expected HTML element perfectly. Both are input elements with the type set to \"search\", which is appropriate for a search bar. The class, placeholder, name, autocomplete, aria-label, aria-autocomplete, and aria-owns attributes are all identical, meaning the styling and functionality should be the same. There is no inner HTML to consider in this case. The role and accessibility attributes are also set correctly for a search input, making it accessible to users with assistive technologies. Therefore, the actual element should function the same way as the expected element."
+      }
+    }
+  },
+  {
+    "task_id": "nasa_search_135",
+    "success": false,
+    "error": "Element not found: id=search-box",
+    "task_description": "Type 'mars rover' in the search box",
+    "timestamp": 1734493132.978092,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/nasa_search_135_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"In the expected output image, the search box contains the typed text 'mars rover'. However, in the agent's output image, the search box is empty, indicating that the text was not typed as required by the task.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected and actual HTML elements match perfectly. They are both 'input' elements with the type set to 'search', which is appropriate for a search box. The class, id, name, value, and placeholder attributes are also identical, meaning the styling and functionality should be the same. There is no inner HTML to consider in this case. The element does not have explicit role or accessibility attributes, but a search input is generally accessible by default. Therefore, the actual HTML element should function as expected for the task of typing 'mars rover' into the search box."
+      }
+    }
+  },
+  {
+    "task_id": "nasa_earth_128",
+    "success": false,
+    "error": "Element not found: id=earth-link",
+    "task_description": "Click the Earth link",
+    "timestamp": 1734493132.9746938,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/nasa_earth_128_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The first image shows the 'Earth' page on the NASA website, which is the expected result when clicking on the 'Earth' link. However, the second image shows a different page titled 'For the Benefit of Humanity', which is not related to the 'Earth' page. This indicates that the agent did not successfully complete the task of clicking the 'Earth' link.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected and actual HTML elements match perfectly. They are both anchor ('a') elements, which are typically used for links. The href attribute, which specifies the URL the link goes to, is the same in both. The inner HTML, which is the clickable content of the link, is also the same in both. There are no id, class, role, or accessibility attributes specified, so there's nothing to compare there, but the absence of these attributes doesn't affect the basic functionality of the link. Therefore, the actual HTML would function the same way for users as the expected HTML."
+      }
+    }
+  },
+  {
+    "task_id": "weather_news_124",
+    "success": false,
+    "error": "Element not found: id=news-link",
+    "task_description": "Click the weather underground link",
+    "timestamp": 1734493132.973158,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/weather_news_124_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click the 'Weather Underground' link, but the second image shows the output from 'The Weather Channel' website, which indicates that the wrong link was clicked. Therefore, the task was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML element matches the expected HTML element. Both are anchor ('a') tags with the same class attributes, href attributes, and aria-label attributes. The inner HTML, which includes an SVG for the Weather Underground logo, is also the same. This means that the functionality of the actual HTML element would be the same as the expected HTML element, allowing users to click the link to navigate to the Weather Underground website. The accessibility attributes are also the same, ensuring that the link is accessible to all users."
+      }
+    }
+  },
+  {
+    "task_id": "cnn_business_141",
+    "success": false,
+    "error": "Element not found: id=business-nav",
+    "task_description": "Click the Business link",
+    "timestamp": 1734493132.989822,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/cnn_business_141_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click on the 'Business' link. The expected outcome is found in the first image where 'Business' is highlighted in the navigation bar on the CNN website, indicating that the 'Business' section is actively being viewed. However, the second image, which represents the agent's output, shows the 'US' section of the website currently active, as indicated by the highlight on 'US' in the navigation bar. This means the task to navigate to the 'Business' section was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected and actual HTML elements match perfectly. They are both anchor ('a') tags with the same class, href attribute, and other data attributes. The inner HTML, which is the clickable text, is also the same (\"Business\"). This means that the functionality and purpose of the actual HTML element matches the expected one. The user would be able to click on the \"Business\" link and be directed to the correct URL in both cases."
+      }
+    }
+  },
+  {
+    "task_id": "cnn_politics_134",
+    "success": false,
+    "error": "Element not found: id=politics-nav",
+    "task_description": "Click the Politics link",
+    "timestamp": 1734493132.977758,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/cnn_politics_134_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The agent did not successfully complete the task. The task was to click the Politics link, but the output image does not show the CNN Politics section as expected. Instead, it displays a general headline section on the CNN website with a pop-up advertisement. The absence of the targeted Politics page content indicates that the task was not accomplished successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML element matches the expected HTML element perfectly. Both are anchor ('a') tags with the same class, href attribute, data attributes, and inner HTML content (\"Politics\"). This means that the element types, essential attributes, and content all match. The role and accessibility attributes are not explicitly defined in either element, but the default role of an anchor tag is \"link\", which is appropriate for this task. Therefore, the element would function the same way for users, allowing them to click the link to navigate to the Politics section of the website."
+      }
+    }
+  },
+  {
+    "task_id": "weather_maps_138",
+    "success": false,
+    "error": "Element not found: id=maps-link",
+    "task_description": "Type in johndoe@email.com in the email signup for mornin brief",
+    "timestamp": 1734493132.978744,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/weather_maps_138_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to type 'johndoe@email.com' into the email signup for the morning brief on the website. In the second image provided by the agent, the email signup box where 'johndoe@email.com' should be entered is not visible. The format and visible sections of the website in the second image suggest that the appropriate task area (email signup) is not displayed, unlike in the first image where the email is correctly entered into the signup box.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: The actual HTML element is of type \"text\" while for an email input field, the type should be \"email\". This is important for proper validation of the input. The browser can provide automatic checks for email format if the type is set to \"email\". Therefore, the actual HTML element does not match the expected functionality."
+      }
+    }
+  },
+  {
+    "task_id": "weather_alerts_131",
+    "success": false,
+    "error": "Element not found: id=alerts-link",
+    "task_description": "Open the menu and click the Hourly button",
+    "timestamp": 1734493132.976607,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/weather_alerts_131_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to open the menu and click the 'Hourly' button on the website. The expected image shows an hourly weather forecast for Miami, FL, indicating that the 'Hourly' button was successfully clicked and the correct page is displayed. The output image, however, still shows the homepage or a general weather map image, not the hourly weather forecast, indicating the 'Hourly' button was not clicked or the action did not navigate to the correct page.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. Both the button and the link elements are present with the same attributes and content. The button has the correct id, classes, and aria attributes for accessibility. The link also has the correct href, classes, and content. Therefore, the elements would function the same way for users, allowing them to open the menu and click the \"Hourly\" button as expected."
+      }
+    }
+  },
+  {
+    "task_id": "flask_search_1",
+    "success": false,
+    "error": "module 'selenium.webdriver.support.expected_conditions' has no attribute 'and_'",
+    "task_description": "Type 'route decorators' into the search box and press search",
+    "timestamp": 1734493264.287638,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/flask_search_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The agent did not successfully complete the task of typing 'route decorators' into the search box and pressing search. The second image shows the Flask documentation main page without any search results displayed, indicating that the search was not executed, whereas the first image shows the search results for 'route decorators' on the Flask website.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types match, as they are both input elements of type \"text\". The key attributes such as name, aria-labelledby, autocomplete, autocorrect, autocapitalize, and spellcheck are all identical. There is no content or inner HTML to consider in this case. The role and accessibility attributes are also the same, ensuring the element would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "pubmed_clinical_150",
+    "success": false,
+    "error": "Invalid selector type: data-ga-label",
+    "task_description": "Click the Clinical Queries link and change the study category to prognosis",
+    "timestamp": 1734493264.2728179,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/pubmed_clinical_150_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click the 'Clinical Queries' link and change the study category to 'prognosis'. The expected image shows the Clinical Queries page with the 'Prognosis' filter selected, whereas the agent's output image shows the general PubMed homepage without navigating to the Clinical Queries section. The required category change is not visible in the output image, indicating the task was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types match, with both having an anchor tag for the \"Clinical Queries\" link and a select tag for changing the study category. The key attributes such as href, data-ga-category, data-ga-action, data-ga-label, name, aria-labelledby, data-initial-value, and id also match. The content and inner HTML are identical, including the options within the select element. The role and accessibility attributes are also the same, ensuring the element would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "react_search_1",
+    "success": false,
+    "error": "module 'selenium.webdriver.support.expected_conditions' has no attribute 'and_'",
+    "task_description": "Type 'hooks tutorial' in the search box",
+    "timestamp": 1734493264.282868,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/react_search_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to type 'hooks tutorial' in the search box on the website. In the output image provided by the agent, the search box is visible but it is empty, showing that no text was typed into it. This indicates that the task was not completed successfully as specified.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected and actual HTML elements are identical. They both use the same tag name (input), have the same type attribute (search), and share the same id, class, and other attributes. The role and accessibility attributes are also the same, ensuring that the element would function the same way for users, including those using assistive technologies. Therefore, the actual HTML element matches the expected element perfectly."
+      }
+    }
+  },
+  {
+    "task_id": "maps_search_1",
+    "success": false,
+    "error": "module 'selenium.webdriver.support.expected_conditions' has no attribute 'and_'",
+    "task_description": "Type 'San Francisco' into the search box and press search",
+    "timestamp": 1734493264.280086,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/maps_search_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to type 'San Francisco' into the search box and press search. The expected image shows a Google Maps search result for 'San Francisco', focusing on details for San Francisco including its map and relevant city information. However, the agent's output image shows a Google Maps search result for 'Berkeley', indicating that the incorrect location was searched. Therefore, the task was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML and the expected HTML are identical. The element types match, all key attributes such as id, class, role, and aria attributes are the same. The content serves the same purpose, which is to provide a search box for users to input their queries. The element would function the same way for users, allowing them to type in their search query and submit it."
+      }
+    }
+  },
+  {
+    "task_id": "youtube_logo_1",
+    "success": false,
+    "error": "Invalid interaction type: hover",
+    "task_description": "Hover over the YouTube logo in the top left",
+    "timestamp": 1734493264.282346,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/youtube_logo_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task required the agent to hover over the YouTube logo in the top left. However, the provided output screenshot does not show any indication that this action was performed (no visual feedback like a tooltip or a highlighted logo). It appears as a normal view of the YouTube interface without any interaction effects visible.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML and the expected HTML are identical. They both use the same SVG element to display the YouTube logo, and the SVG paths are the same. The attributes such as id, width, height, viewBox, focusable, and aria-hidden are also the same. The style attributes are identical as well. Therefore, the elements match in functionality and purpose."
+      }
+    }
+  },
+  {
+    "task_id": "w3_tutorial_1",
+    "success": false,
+    "error": "Failed evaluation checks",
+    "task_description": "Click the HTML Tutorial link",
+    "timestamp": 1734493264.288297,
+    "html_element": "<a id=\"w3-logo\" href=\"https://www.w3schools.com\" class=\"w3-bar-item w3-button w3-hover-none w3-left ga-top ga-top-w3home\" title=\"Home\" style=\"width: 75px\" aria-label=\"Home link\">\n      <i class=\"fa fa-logo ws-hover-text-green\" style=\"position: relative; z-index: 1; color: #04aa6d; font-size: 36px !important\" aria-hidden=\"true\"></i>\n    </a>",
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/w3_tutorial_1_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The agent did not successfully complete the task as specified. The task was to click the 'HTML Tutorial' link, but the output shows a general 'Learn to Code' page with a search box - it does not show a page specifically dedicated to an HTML tutorial. This indicates that the HTML Tutorial link was not successfully clicked to reach its target content.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: The actual HTML element does not match the expected HTML element in functionality and purpose. \n\n1. Element type: Both elements are anchor tags (<a>), so the element types match.\n2. Key attributes: The id and class attributes do not match. The expected HTML has an id of \"navbtn_tutorials\" and a class that includes \"tnb-nav-btn\", \"w3-bar-item\", \"w3-button\", \"barex\", \"bar-item-hover\", \"w3-padding-16\", \"ga-top\", and \"ga-top-tut-and-ref\". The actual HTML has an id of \"w3-logo\" and a class that includes \"w3-bar-item\", \"w3-button\", \"w3-hover-none\", \"w3-left\", \"ga-top\", and \"ga-top-w3home\". The href attribute in the actual HTML points to the W3Schools home page, not a tutorial.\n3. Content and inner HTML: The content does not serve the same purpose. The expected HTML is for a button that opens a navigation item for tutorials, while the actual HTML is for a link to the W3Schools home page.\n4. Role and accessibility attributes: The role attribute in the expected HTML is \"button\", indicating that it is meant to be interacted with like a button. The actual HTML does not have a role attribute, so it would not function the same way for users. The aria-label in the actual HTML is \"Home link\", not related to tutorials."
+      }
+    }
+  },
+  {
+    "task_id": "amazon_cart_1",
+    "success": true,
+    "error": null,
+    "task_description": "Click the Cart button",
+    "timestamp": 1734493264.277597,
+    "html_element": "<a href=\"/gp/cart/view.html?ref_=nav_cart\" aria-label=\"0 items in cart\" class=\"nav-a nav-a-2 nav-progressive-attribute\" id=\"nav-cart\">\n    <div id=\"nav-cart-count-container\">\n      <span id=\"nav-cart-count\" aria-hidden=\"true\" class=\"nav-cart-count nav-cart-0 nav-progressive-attribute nav-progressive-content\">0</span>\n      <span class=\"nav-cart-icon nav-sprite\"></span>\n    </div>\n    <div id=\"nav-cart-text-container\" class=\" nav-progressive-attribute\">\n      <span aria-hidden=\"true\" class=\"nav-line-1\">\n        \n      </span>\n      <span aria-hidden=\"true\" class=\"nav-line-2\">\n        Cart\n        <span class=\"nav-icon nav-arrow\"></span>\n      </span>\n    </div>\n  </a>",
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/amazon_cart_1_after.png",
+    "final_score": 1.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 1.0,
+        "explanation": "{\n  \"correctness\": true,\n  \"reason\": \"The expected and output images show that the Cart button was clicked successfully. Both images display the Amazon Cart page, indicating that the cart is empty, which matches the goal of the agent's task. The layout, elements, and messaging in both screenshots are consistent, confirming that the action to click the Cart button was correctly performed.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML element is an anchor tag (<a>) which is more appropriate for the task of clicking a Cart button as it provides a link to the cart page. The expected HTML element is a div, which is not inherently interactive. However, the actual HTML element includes the expected HTML as its inner HTML, so the visual presentation and accessibility attributes should be the same. The id \"nav-cart-text-container\" and the content \"Cart\" are present in both. The actual HTML also includes additional accessibility features, such as an aria-label for the link and hiding the cart count from screen readers with aria-hidden=\"true\". Therefore, the actual HTML should function the same way for users, if not better due to the improved semantics and accessibility."
+      }
+    }
+  },
+  {
+    "task_id": "pubmed_search_149",
+    "success": false,
+    "error": "Failed evaluation checks",
+    "task_description": "Click see trending articles and search uc berkeley",
+    "timestamp": 1734493264.272562,
+    "html_element": "<a href=\"/39674178/\" data-ga-category=\"result_click\" data-ga-action=\"trending\" data-ga-label=\"39674178\">\n                Intermittent fasting triggers interorgan communication to suppress hair follicle regeneration.\n              </a>",
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/pubmed_search_149_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task required clicking on 'see trending articles' and searching for 'uc berkeley'. The first image shows the state of the website with 'uc berkeley' entered in the search bar on the trending articles page, which meets the task's conditions. However, the second image is the homepage of PubMed without the 'trending articles' page being accessed or 'uc berkeley' being searched. Thus, the output does not match the expected result as it does not show the 'trending articles' page or any search results for 'uc berkeley'.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: The actual HTML element does not match the expected HTML element in functionality and purpose. The expected HTML element is a link to the \"trending\" page, as indicated by the data-href attribute value \"/trending/\". However, the actual HTML element is a link to a specific article, as indicated by the href attribute value \"/39674178/\". Furthermore, the content of the actual HTML element is the title of a specific article, not a prompt to see more trending articles. Therefore, the actual HTML element would not function the same way for users as the expected HTML element."
+      }
+    }
+  },
+  {
+    "task_id": "cambridge_lookup_1",
+    "success": false,
+    "error": "module 'selenium.webdriver.support.expected_conditions' has no attribute 'and_'",
+    "task_description": "Click the search box and type 'hello'",
+    "timestamp": 1734493264.276532,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/cambridge_lookup_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task specified was to click the search box on the Cambridge Dictionary website and type 'hello'. In the second image (agent's output), the search box is visible but no text appears to have been typed into it. The expected behavior, as seen in the first image, was not replicated in the agent's output, indicating the task was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected HTML and the actual HTML are identical. They both use the same input tag and have the same attributes such as type, name, id, class, and aria-label. The placeholder attribute is also the same, indicating the same user instruction. The role and accessibility attributes are also identical, ensuring the same level of accessibility. Therefore, the elements match perfectly in functionality and purpose."
+      }
+    }
+  },
+  {
+    "task_id": "node_nav_1",
+    "success": false,
+    "error": "Element not found: class=docs-link",
+    "task_description": "Click the Docs link",
+    "timestamp": 1734493264.290617,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/node_nav_1_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The expected outcome of the task was to click on the 'Docs' link. The first image shows a search results page from MySQL on Oracle's website, which was set as the expected result if the 'Docs' link related to MySQL was clicked correctly. However, the second image displays the Node.js homepage, which is unrelated to the expected MySQL documentation page on Oracle's website. This indicates that the agent did not successfully complete the task as specified.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: Although the expected and actual HTML elements match in terms of element type, key attributes, and content, they do not provide the functionality required for the task. The task requires a clickable link, which is typically represented by an <a> tag in HTML. The <span> tag is not inherently interactive and does not provide the necessary functionality for the task. Additionally, there are no role or accessibility attributes present that would make the <span> element function as a link. Therefore, the actual HTML does not match the expected functionality."
+      }
+    }
+  },
+  {
+    "task_id": "pubmed_search_146",
+    "success": false,
+    "error": "Element not found: id=id-term",
+    "task_description": "Click the FAQs & User Guide link",
+    "timestamp": 1734493264.271789,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/pubmed_search_146_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click the 'FAQs & User Guide' link, which should result in a page displaying the FAQs section as shown in the first image. However, the second image shows the homepage of PubMed and not the FAQs & User Guide page. Thus, the agent did not successfully complete the task.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. Both are anchor ('a') tags with the same href attribute, pointing to the \"/help/\" page. The data-ga-category, data-ga-action, and data-ga-label attributes are also identical, indicating that the same Google Analytics tracking would be applied. The visible text within the tags, \"FAQs & User Guide\", is also the same, meaning users would see the same link text. Therefore, the elements match in type, attributes, content, and would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "pubmed_search_148",
+    "success": false,
+    "error": "Element not found: id=usa-gov-link",
+    "task_description": "Click usa.gov link",
+    "timestamp": 1734493264.272275,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/pubmed_search_148_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click on the usa.gov link as specified, but the output image shows a page from PubMed, which is unrelated to the usa.gov link. The expected image should show the result of navigating to the usa.gov site or a page directly related to it after clicking the link.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected and actual HTML elements match perfectly. They are both anchor ('a') tags, which are used for creating hyperlinks. The class attribute is the same (\"text-white\"), which likely controls the styling of the link. The href attribute, which specifies the URL the link goes to, is also the same (\"https://www.usa.gov/\"). The visible text of the link (\"USA.gov\") is identical as well. There are no differences in role or accessibility attributes, as none are specified in either the expected or actual HTML. Therefore, these elements would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "pubmed_search_147",
+    "success": false,
+    "error": "Element not found: id=x-button",
+    "task_description": "Click X (Twitter) icon",
+    "timestamp": 1734493264.272106,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/pubmed_search_147_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The agent was expected to click the Twitter icon, which should result in navigating to the Twitter page related to NCBI. The output image, however, shows the PubMed homepage and not the Twitter profile of NCBI. This indicates that the Twitter icon was not successfully clicked or that the wrong icon was clicked, failing to meet the specified task's goal.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types are the same, being an anchor tag (<a>). The key attributes such as class, id, href, and aria-label are identical. The content and inner HTML, which includes the SVG for the Twitter icon, are also the same. The role and accessibility attributes are present and identical, with the aria-label providing necessary information for screen readers. Therefore, the element would function the same way for users, allowing them to click the Twitter icon and be redirected to the specified Twitter page."
+      }
+    }
+  },
+  {
+    "task_id": "pubmed_search_149",
+    "success": false,
+    "error": "Element not found: id=usa-gov-link",
+    "task_description": "Click see tending articles and search uc berkeley",
+    "timestamp": 1734493264.272418,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/pubmed_search_149_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task required clicking on 'see trending articles' and searching for 'uc berkeley'. The first image shows the state of the website with 'uc berkeley' entered in the search bar on the trending articles page, which meets the task's conditions. However, the second image is the homepage of PubMed without the 'trending articles' page being accessed or 'uc berkeley' being searched. Thus, the output does not match the expected result as it does not show the 'trending articles' page or any search results for 'uc berkeley'.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: The actual HTML element does not match the expected HTML element in functionality and purpose. The expected HTML element is a link to the \"trending\" page, as indicated by the data-href attribute value \"/trending/\". However, the actual HTML element is a link to a specific article, as indicated by the href attribute value \"/39674178/\". Furthermore, the content of the actual HTML element is the title of a specific article, not a prompt to see more trending articles. Therefore, the actual HTML element would not function the same way for users as the expected HTML element."
+      }
+    }
+  },
+  {
+    "task_id": "python_nav_1",
+    "success": false,
+    "error": "Element not found: class=reference-nav",
+    "task_description": "Click the Library Reference link",
+    "timestamp": 1734493264.288393,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/python_nav_1_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The expected image shows content from the 'Python Standard Library' page within the Python documentation, clearly indicating that the 'Library Reference' link has been selected. The output image, however, is on the main documentation index page for Python 3.13.1, which is essentially a high-level overview of documentation sections and does not directly show or relate to the contents of the 'Library Reference'. Thus, the task of clicking the 'Library Reference' link was not accomplished successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: The actual HTML element does not match the expected element for the task. The task specifies that the link should lead to the \"Library Reference\", but the actual HTML leads to \"Language reference\". Therefore, the content does not serve the same purpose, and the element would not function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "vue_search_1",
+    "success": false,
+    "error": "Element not found: id=search-input",
+    "task_description": "Type 'component props' into the search box and press search",
+    "timestamp": 1734493264.2851999,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/vue_search_1_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The expected image shows the 'Props Declaration' section on the Vue.js guide website after searching for 'component props'. However, the output image shows the 'Introduction' section instead, indicating the agent did not correctly type 'component props' into the search box or did not successfully navigate to the correct page after searching.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: The provided HTML elements are not suitable for the task specified. The task involves typing 'component props' into a search box and pressing search, but the HTML provided does not include an input field where text can be entered. The HTML provided seems to be for a search button, but without an associated input field, it cannot fulfill the task. Additionally, there are no accessibility attributes such as 'aria-label' or 'role' present in the HTML."
+      }
+    }
+  },
+  {
+    "task_id": "mdn_nav_1",
+    "success": false,
+    "error": "Element not found: class=nav-guides",
+    "task_description": "Click the Guides link in the navigation",
+    "timestamp": 1734493264.28811,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/mdn_nav_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The expected image shows the 'Guides' page of the Mozilla Developer Network (MDN) website with a focus on various web development guides. In contrast, the output image depicts a different page on the same website, specifically a landing page featuring a promotional banner for AWS. The 'Guides' link does not appear to have been clicked as indicated by the content displayed in the output image, failing to meet the task's goal.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. Both are anchor ('a') elements with the same href attribute, class, and inner HTML content (\"Guides\"). This means they would link to the same page and look the same way in the website's design. There are no differences in accessibility attributes, so they would also function the same way for all users."
+      }
+    }
+  },
+  {
+    "task_id": "mysql_search_2",
+    "success": false,
+    "error": "Element not found: id=search-input",
+    "task_description": "Type 'stored procedures' in the search box",
+    "timestamp": 1734493264.292748,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/mysql_search_2_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "Evaluation failed: [Errno 2] No such file or directory: 'evaluation/ground_truth/task_62_gt.png'"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Evaluation failed: [Errno 2] No such file or directory: 'evaluation/ground_truth/task_62_gt.png'"
+      }
+    }
+  },
+  {
+    "task_id": "django_search_1",
+    "success": false,
+    "error": "Element not found: id=search-input",
+    "task_description": "Type 'model fields' in the search box and click search",
+    "timestamp": 1734493264.287366,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/django_search_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to type 'model fields' in the search box and click search. In the first image (expected image), we can observe that the search results for 'model fields' are displayed, indicating successful task completion. However, in the second image (agent's output), the search box is empty and no search has been conducted; it remains on the main documentation page without showing any results for 'model fields'. Therefore, the task was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected and actual HTML elements match perfectly. Both are input elements of type \"search\" with the same name attribute \"q\" and the same id \"id_q\". The placeholder attribute also matches, providing the same instruction to users. There are no differences in the role and accessibility attributes as well. Therefore, the actual HTML element would function the same way as the expected one for users."
+      }
+    }
+  },
+  {
+    "task_id": "weather_today_145",
+    "success": false,
+    "error": "Element not found: id=go-premium-link",
+    "task_description": "Click the go premium button",
+    "timestamp": 1734493264.269836,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/weather_today_145_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click the 'Go Premium' button. The expected image shows the subscription page of The Weather Channel, specifically focusing on the premium subscription options. However, the output image shows a homepage or a content page of The Weather Channel, not related to premium subscription or any upgrade actions. This indicates that the 'Go Premium' button was not clicked successfully, or the button click did not lead to the appropriate premium page as shown in the expected image.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected and actual HTML elements are identical. They are both anchor ('a') tags with the same class attributes, href attributes, target attributes, and inner HTML content (\"Go Premium\"). This means they would function in the same way when clicked, leading the user to the \"/subscribe?tpcc=mktg-subscription-mainmenu-subscribe\" page in the same browsing context. There are no differences in accessibility attributes or any other attributes. Therefore, the actual HTML element matches the expected element perfectly."
+      }
+    }
+  },
+  {
+    "task_id": "flask_search_2",
+    "success": false,
+    "error": "module 'selenium.webdriver.support.expected_conditions' has no attribute 'and_'",
+    "task_description": "Type 'database' into the search box and press search",
+    "timestamp": 1734493391.118828,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/flask_search_2_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to type 'database' into the search box and press search. The expected result, as per the first image, is a results page with the search term 'database' filled in the search box and search results listed underneath. However, the second image shows the homepage of Flask's documentation without any signs of a search action being performed. The search box is empty and there are no search results displayed. Therefore, the task was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types match, as they are both input elements of type \"text\". The key attributes such as name, aria-labelledby, autocomplete, autocorrect, autocapitalize, and spellcheck are all present and identical in both the expected and actual HTML. There is no content or inner HTML to compare in this case, but the purpose of the element is the same in both: to provide a text input field for a search query. The role and accessibility attributes are also the same, ensuring the element would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "flask_nav_1",
+    "success": false,
+    "error": "Element not found: class=nav-api",
+    "task_description": "Click the API Reference link",
+    "timestamp": 1734493391.121614,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/flask_nav_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The expected image shows the API Reference section of a Flask documentation website, which suggests that the API Reference link has been clicked, displaying details such as Application Object, Blueprint Objects, etc. The output image, however, remains on the Flask main documentation page without navigating to the API Reference section, as indicated by the continued visibility of general sections like Installation and Welcome to Flask. Thus, the task of clicking the API Reference link was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. Both are anchor ('a') tags with the same class attribute (\"reference internal\") and href attribute (\"#api-reference\"). The visible text within the tags (\"API Reference\") is also identical. There are no differences in role or accessibility attributes. Therefore, the elements match in functionality and purpose."
+      }
+    }
+  },
+  {
+    "task_id": "react_nav_1",
+    "success": false,
+    "error": "Element not found: class=nav-tutorial",
+    "task_description": "Click the Get Started link",
+    "timestamp": 1734493391.117107,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/react_nav_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click the 'Get Started' link. The first image shows a page labeled 'Getting Started' from a documentation site, where a 'Go to react.dev' link is suggested. The second image shows the homepage of the React website, not a secondary page from clicking 'Get Started' on the documentation site. The second image does not reflect the expected result of clicking a 'Get Started' link that would typically navigate to an introductory or setup guide within the same documentation context.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types are both 'a' tags, which are used for links. The class attribute is the same, and the href attribute, which determines where the link goes, is also the same. The visible text within the tags is \"Get Started\" in both cases, which matches the task description. There are no role or accessibility attributes present, but none are required for basic link functionality. Therefore, the elements would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "python_type_2",
+    "success": false,
+    "error": "Element not found: id=search-input",
+    "task_description": "Type 'list comprehension' into the search box",
+    "timestamp": 1734493391.138976,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/python_type_2_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to type 'list comprehension' into the search box of the Python documentation page. The first screenshot shows the search box with 'list comprehension' correctly typed in. However, the second screenshot shows the search box empty, indicating that the agent did not successfully type 'list comprehension' as specified.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types are the same, being an input field of type \"search\". The key attributes such as placeholder, aria-label, type, name, and id are all identical. There is no inner HTML to consider in this case. The role and accessibility attributes are also the same, with the aria-label providing the necessary accessibility support. Therefore, the element would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "php_search_1",
+    "success": false,
+    "error": "Element not found: id=search-text",
+    "task_description": "Type 'regex' into the search box and press search",
+    "timestamp": 1734493391.132927,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/php_search_1_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "Evaluation failed: [Errno 2] No such file or directory: 'evaluation/ground_truth/task_42_gt.png'"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Evaluation failed: [Errno 2] No such file or directory: 'evaluation/ground_truth/task_42_gt.png'"
+      }
+    }
+  },
+  {
+    "task_id": "postgres_search_2",
+    "success": false,
+    "error": "Element not found: id=docSearch",
+    "task_description": "Type 'replication' in the search box",
+    "timestamp": 1734493391.121863,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/postgres_search_2_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to type 'replication' in the search box. The expected image shows the search box containing the typed keyword 'replication' with search results relevant to it. However, the agent's output in the second image does not show the word 'replication' typed into the search box; instead, the search box is empty and the page displayed is related to documentation manuals, not search results for 'replication'.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: The expected and actual HTML elements provided are both buttons with a search icon, which are typically used to submit a search query. However, neither of these elements are suitable for the task of typing 'replication' in a search box. For this task, an input element of type text would be expected, such as: <input type=\"text\" id=\"search\" name=\"search\">. The button elements provided would be used to submit the search query after the user has typed 'replication' into the appropriate input field."
+      }
+    }
+  },
+  {
+    "task_id": "django_nav_1",
+    "success": false,
+    "error": "Element not found: class=community-tutorial",
+    "task_description": "Click the Community link",
+    "timestamp": 1734493391.118191,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/django_nav_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click the 'Community' link. The expected image shows the 'Community' page on the Django website, evidenced by the URL 'djangoproject.com/community/' and content related to community engagement. The output image, however, shows the 'Documentation' page of the Django website, as indicated by the headers and content related to Django documentation, not the community page. This suggests that the agent navigated to the wrong page.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types are the same, being the 'a' tag which is used for links. The key attribute, in this case the 'href' attribute, is also the same in both the expected and actual HTML. The content, 'Community', is identical in both cases. There are no role or accessibility attributes specified, but since the actual HTML matches the expected HTML, it can be assumed that this is not an issue. Therefore, the element would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "postgres_nav_1",
+    "success": false,
+    "error": "Element not found: class=dev-link",
+    "task_description": "Click the Developers link",
+    "timestamp": 1734493391.115995,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/postgres_nav_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click the 'Developers' link, which is expected to navigate to the Developers section of the website. The first image shows the correct Developers page, as indicated by the content sections about who PostgreSQL developers are, what you can find there, and details about a CommitFest. The second image, however, shows the Documentation page of the website, as indicated by sections discussing manuals, release notes, and tutorials, which is different from the expected Developers page content. Therefore, the task was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types are the same, being a list item (li) with a nested anchor (a) tag. The key attributes such as class and href also match exactly. The content, \"Developers\", is the same in both cases. There are no explicit role or accessibility attributes, but the default roles and accessibility of these elements are assumed to be the same. Therefore, the elements would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "vue_nav_1",
+    "success": false,
+    "error": "Element not found: class=nav-api",
+    "task_description": "Click the API Reference link",
+    "timestamp": 1734493391.121099,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/vue_nav_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click on the 'API Reference' link. The expected outcome, as shown in the first image, features an API Reference page listing various API elements under categories like 'Global API', 'Application', and 'General'. However, the output in the second image shows a general introduction page to Vue.js, indicating that the 'Docs' link was clicked instead of the 'API Reference' link, or a different section within the Docs.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML element matches the expected HTML element perfectly. Both are anchor ('a') tags with the same class attributes, href attributes, and data attributes. The content within the tags is also the same, which is \"API\". There are no differences in the role and accessibility attributes. Therefore, the actual HTML element would function the same way as the expected HTML element for users."
+      }
+    }
+  },
+  {
+    "task_id": "react_search_2",
+    "success": false,
+    "error": "Element not found: id=algolia-doc-search",
+    "task_description": "Type 'context api' in the search box",
+    "timestamp": 1734493391.1209311,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/react_search_2_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to type 'context api' in the search box on the React website. The expected image shows the search results for 'context api' displaying relevant API options such as useContext and createContext. The output image, however, shows the home page of the React website with the search box empty, indicating that the search was not performed as expected.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: The expected HTML element for a search box where a user can type 'context api' should be an input element, not a button. The actual HTML provided is a button element, which is used to trigger an action when clicked, not to receive user input. The correct HTML for a search box would look something like this: `<input type=\"text\" id=\"search\" name=\"search\">`. This input field allows users to type text into it. The button element in the actual HTML does not have this functionality."
+      }
+    }
+  },
+  {
+    "task_id": "mysql_nav_2",
+    "success": false,
+    "error": "Element not found: class=release_notes",
+    "task_description": "Click the Release Notes link",
+    "timestamp": 1734493391.1307142,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/mysql_nav_2_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click the 'Release Notes' link. The expected output should show the MySQL 8.4 Release Notes page as displayed in the first image. However, the output image shows the main documentation page with a section highlighted for 'HeatWave,' indicating that the 'Release Notes' link was not successfully clicked, and the specific release notes page was not opened.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. Both are anchor ('a') tags with the same class attribute, href attribute, and inner HTML content. The element types, key attributes, and content are identical. There are no role or accessibility attributes specified, but since the actual and expected HTML are the same, we can assume they would function the same way for users. Therefore, the actual HTML element matches the expected element for the task."
+      }
+    }
+  },
+  {
+    "task_id": "php_nav_1",
+    "success": false,
+    "error": "Element not found: class=get_involved",
+    "task_description": "Click the Get Involved link",
+    "timestamp": 1734493391.116755,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/php_nav_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click on the 'Get Involved' link. The expected outcome, shown in the first image, is the 'Get Involved' page detailing ways to contribute to PHP. The agent's output, shown in the second image, displays the 'Documentation' page instead. Therefore, the task was not completed successfully as the correct page was not reached.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types are the same, being the 'a' tag which is used for links. The key attributes, in this case the 'href' and 'class', are identical in both the expected and actual HTML. The content, \"Get Involved\", is also the same in both versions. There are no role and accessibility attributes specified, but since the actual HTML matches the expected HTML, it can be assumed that this is correct. Therefore, the element would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "postgres_search_1",
+    "success": false,
+    "error": "Element not found: id=docSearch",
+    "task_description": "Type 'indexes' in the search box",
+    "timestamp": 1734493391.119633,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/postgres_search_1_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The expected image shows 'indexes' typed into the search box, with search results displayed as output. The second image (agent's output) does not show 'indexes' typed into the search box, nor does it display any search results, indicating that the task of typing 'indexes' into the search box and displaying search results was not completed.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: The provided HTML is a button element, which is used to submit a form or trigger an event. However, the task requires a text input field where users can type 'indexes'. The expected HTML should be an input element with type=\"text\", not a button. The button can be used to submit the search, but it cannot be used to input text. Therefore, the actual HTML does not match the expected functionality."
+      }
+    }
+  },
+  {
+    "task_id": "vue_search_2",
+    "success": false,
+    "error": "Element not found: id=search-input",
+    "task_description": "Type 'router' into the search box and press search",
+    "timestamp": 1734493391.13811,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/vue_search_2_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to type 'router' into the search box and press search. The expected output should display results or content relevant to 'router' as shown in the first image where information about Vue Router is displayed. However, the second image shows the 'Introduction' page of the Vue.js documentation without any relevance to 'router', indicating that the task was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: The provided HTML elements are only for the search button, represented by an SVG icon and a span with the text \"Search\". However, for the task of typing 'router' into the search box and pressing search, we would also expect to see an input field where the user can type their search query. This input field is missing in the provided HTML. Therefore, the actual HTML does not match the expected HTML for the described task."
+      }
+    }
+  },
+  {
+    "task_id": "mysql_nav_1",
+    "success": false,
+    "error": "Element not found: class=reference-link",
+    "task_description": "Click the Reference Manual link",
+    "timestamp": 1734493391.116447,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/mysql_nav_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click the 'Reference Manual' link. The expected image showcases that the 'MySQL 8.4 Reference Manual' page is fully displayed, indicating that the link was successfully clicked and the correct page was loaded. However, the output image shows the homepage of the MySQL site, with the 'Reference Manual' link visible but not accessed. This indicates that the agent did not complete the task as specified.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types are the same, being a list item (<li>) with a nested anchor tag (<a>). The key attributes such as class and href also match exactly. The content, \"Reference Manual\", is the same in both, serving the same purpose. There are no explicit role or accessibility attributes, but the inherent roles of the <li> and <a> tags are the same. Therefore, the element would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "django_search_2",
+    "success": false,
+    "error": "Element not found: id=search-input",
+    "task_description": "Type 'forms' into the search box and press search",
+    "timestamp": 1734493391.121343,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/django_search_2_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The expected output should show a search results page for the term 'forms' within the Django documentation site, as evidenced by the first image with search results displaying '187 results for forms in version 5.1'. However, the agent's output, shown in the second image, displays the main documentation page without any search results for 'forms'. This indicates that the task of typing 'forms' into the search box and pressing search was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected and actual HTML elements match perfectly. They are both input elements of type \"search\" with the same name, placeholder, and id attributes. There is no content or inner HTML to compare, but since the tags and attributes match, we can infer that they would serve the same purpose. The role and accessibility attributes are not explicitly defined, but the input type of \"search\" implies certain accessibility features, such as being focusable and usable with a keyboard. Therefore, the element would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "mysql_search_3",
+    "success": false,
+    "error": "Element not found: id=search-input",
+    "task_description": "Type 'triggers' into the search box and press search",
+    "timestamp": 1734493391.119854,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/mysql_search_3_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to type 'triggers' into the search box and press search. The expected result would show a page like in the first screenshot with the search term 'triggers' entered in the search box and relevant search results displayed for 'triggers'. The second image shows the homepage of MySQL website without the search term being entered or any search being performed. Therefore, the agent did not complete the task as specified.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types match as both are input elements of type \"search\". The key attributes such as id, class, placeholder, aria-label, and name are identical in both. There is no content or inner HTML to compare in this case. The role and accessibility attributes are also the same, with the aria-label providing the necessary accessibility support. Therefore, the element would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "redis_type_1",
+    "success": false,
+    "error": "Element not found: id=docsearch",
+    "task_description": "Type 'caching' into the search box",
+    "timestamp": 1734493391.138527,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/redis_type_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to type 'caching' into the search box on the Redis Docs page. The expected image shows the search box containing the word 'caching'. However, the output image shows the search box without 'caching' typed in, instead displaying the placeholder text 'Ask our AI-powered Redis copilot a question...'. Hence, the task was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected and actual HTML elements are identical. They are both input elements with the same attributes, including id, name, class, autocomplete, autocorrect, autocapitalize, spellcheck, placeholder, maxlength, type, value, and tabindex. Therefore, they would function the same way for users, allowing them to type 'caching' into the search box."
+      }
+    }
+  },
+  {
+    "task_id": "node_nav_2",
+    "success": false,
+    "error": "Element not found: class=nav-getting-started",
+    "task_description": "Click the Getting Started link",
+    "timestamp": 1734493391.1375701,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/node_nav_2_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click the 'Getting Started' link, but the output image shows the Node.js home page, which is unrelated to the specified action. The expected interaction was not completed as per the task requirements.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected and actual HTML elements match perfectly. They are both anchor ('a') tags, which are typically used for links. The class attribute is the same (\"nav-getting-started\"), which means they would be styled the same way in CSS. The href attribute is also the same (\"/getting-started\"), which means they link to the same page. The inner HTML is the same (\"Getting Started\"), which means they display the same text to users. There are no role or accessibility attributes present, but since they are not required for basic functionality, their absence does not make the elements incorrect."
+      }
+    }
+  },
+  {
+    "task_id": "node_search_1",
+    "success": false,
+    "error": "Element not found: id=search",
+    "task_description": "Type 'events' into the search box and press search",
+    "timestamp": 1734493391.120564,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/node_search_1_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The agent failed to accomplish the task successfully. The task was to type 'events' into the search box and press search. The expected outcome was to see the search results related to 'events', possibly documentation or definitions as shown in the first image. Instead, the agent's output image shows an index of directories and files, indicating that the agent navigated to an incorrect or unrelated page.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: The provided HTML element is a custom element (orama-search-button) which seems to be a button based on its name and content. However, for the task of typing 'events' into a search box and pressing search, we would expect to see an input element for the user to type into, and a button element to submit the search. This element does not provide the necessary functionality for the described task. It lacks the input field where the user can type 'events'. Also, the role and accessibility attributes do not indicate that this is a search function. Therefore, the actual HTML does not match the expected HTML for this task."
+      }
+    }
+  },
+  {
+    "task_id": "swift_click_1",
+    "success": true,
+    "error": null,
+    "task_description": "Click the Blog link",
+    "timestamp": 1734493417.85276,
+    "html_element": "<a href=\"/blog/\" data-text=\"Blog\">Blog</a>",
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/swift_click_1_after.png",
+    "final_score": 1.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 1.0,
+        "explanation": "{\n  \"correctness\": true,\n  \"reason\": \"The agent successfully clicked on the 'Blog' link. The output image shows that the webpage displayed is the blog page of swift.org, identical to the expected image. The titles and content in both images confirm that the task was correctly executed.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. Both are anchor tags (<a>) which are used for links. The href attribute, which specifies the link destination, is the same (\"/blog/\") in both. The data-text attribute, which can be used for additional information or functionality, is also the same (\"Blog\"). The visible text that users would click on (\"Blog\") is the same in both. There are no differences in role or accessibility attributes. Therefore, the actual HTML would function the same way for users as the expected HTML."
+      }
+    }
+  },
+  {
+    "task_id": "python_click_1",
+    "success": false,
+    "error": "Failed evaluation checks",
+    "task_description": "Click the Modules link",
+    "timestamp": 1734493417.853596,
+    "html_element": "<a class=\"biglink\" href=\"tutorial/index.html\">Tutorial</a>",
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/python_click_1_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task specified was to click the 'Modules' link. The first image shows the Python Module Index page, which indicates that the 'Modules' link was successfully clicked, whereas the second image shows the Python Tutorial page. This means the agent did not navigate to the correct page as specified in the task, indicating that the task was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: The elements do not match for the following reasons:\n1. The element types match as they are both anchor ('a') tags.\n2. The essential attributes do not match. The expected HTML is linking to \"py-modindex.html\" while the actual HTML is linking to \"tutorial/index.html\". This means they are directing the user to different pages.\n3. The content does not serve the same purpose. The expected HTML is labeled as \"modules\" while the actual HTML is labeled as \"Tutorial\". This means they are intended to direct the user to different content.\n4. The element would not function the same way for users because they lead to different pages and serve different purposes."
+      }
+    }
+  },
+  {
+    "task_id": "rust_click_1",
+    "success": true,
+    "error": null,
+    "task_description": "Click the Playground link",
+    "timestamp": 1734493417.854422,
+    "html_element": "<a href=\"https://play.rust-lang.org/\">Playground</a>",
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/rust_click_1_after.png",
+    "final_score": 1.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 1.0,
+        "explanation": "{\n  \"correctness\": true,\n  \"reason\": \"The agent successfully completed the task. Both the expected and output images display the Rust Playground website, showing the same content ('fn main() { println!(\\\"Hello, world!\\\"); }') in the code editor, along with identical UI elements such as 'RUN', 'DEBUG', 'STABLE', and additional tools and configuration options. This indicates that the agent has clicked the 'Playground' link and landed on the correct page as expected.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types are the same, both being anchor ('a') tags. The key attribute, in this case the 'href' attribute, is identical in both the expected and actual HTML. The content, \"Playground\", is also the same in both cases. There are no role or accessibility attributes specified, but since the actual HTML matches the expected HTML, it can be assumed that this is correct. Therefore, the element would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "postgres_type_1",
+    "success": false,
+    "error": "module 'selenium.webdriver.support.expected_conditions' has no attribute 'and_'",
+    "task_description": "Type 'joins' into the search box",
+    "timestamp": 1734493417.85041,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/postgres_type_1_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The search box in the second image is empty, indicating that the term 'joins' was not typed into the search box as expected. Therefore, the task was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: The provided HTML is for a submit button, not a search box. The expected HTML should be an input field with type=\"text\" or type=\"search\" for users to type 'joins' into. The button is used to submit the form data, but it doesn't provide a place for users to input text. Therefore, the actual HTML does not match the expected functionality."
+      }
+    }
+  },
+  {
+    "task_id": "github_search_1",
+    "success": false,
+    "error": "module 'selenium.webdriver.support.expected_conditions' has no attribute 'and_'",
+    "task_description": "Type 'tensorflow' in the search box",
+    "timestamp": 1734493417.883015,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/github_search_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The second image does not show 'tensorflow' typed into the search box as expected and illustrated in the first image. The search box remains empty.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML element matches the expected HTML element perfectly. Both are input elements with the same attributes, including id, name, type, role, and various data attributes. The role and accessibility attributes are also identical, ensuring the same user experience. There is no content or inner HTML to compare in this case, but the lack of it in both elements also constitutes a match. Therefore, the actual element would function the same way as the expected element for users."
+      }
+    }
+  },
+  {
+    "task_id": "go_click_1",
+    "success": false,
+    "error": "Failed evaluation checks",
+    "task_description": "Click the Installing Go link",
+    "timestamp": 1734493417.853961,
+    "html_element": "<a href=\"/doc/install\" aria-describedby=\"index-description\">Installing Go</a>",
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/go_click_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click the 'Installing Go' link. The expected outcome should show a change in the page content pertinent to the 'Installing Go' link being accessed. However, both the first (expected) and second (output) images show the same 'Download and Install' page with no indication that the 'Installing Go' link has been clicked or that the content for 'Installing Go' has been loaded. Therefore, the task has not been completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types are the same, being the 'a' tag which is used for links. The key attributes, in this case 'href' and 'aria-describedby', are identical in both the expected and actual HTML. The content, \"Installing Go\", is also the same in both versions. The role and accessibility attributes are also the same, with 'aria-describedby' being used for accessibility purposes. Therefore, the elements match in functionality and purpose."
+      }
+    }
+  },
+  {
+    "task_id": "scala_click_1",
+    "success": true,
+    "error": null,
+    "task_description": "Click the Learn link",
+    "timestamp": 1734493417.85535,
+    "html_element": "<a href=\"https://docs.scala-lang.org\">Learn</a>",
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/scala_click_1_after.png",
+    "final_score": 1.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 1.0,
+        "explanation": "{\n  \"correctness\": true,\n  \"reason\": \"The task was to click the 'Learn' link. In the second image, we can see the content corresponding to the 'Learn' section with the title 'LEARN SCALA' and various subsections like 'Getting Started', 'Tour of Scala', and others. This matches with the first image which shows the expected output after clicking on the 'Learn' link, therefore confirming that the task was completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. Both are anchor ('a') tags, which are used for links. They both have the same href attribute, which is the URL the link goes to. The visible text of the link, \"Learn\", is also the same in both. There are no differences in id, class, or other attributes, and no accessibility attributes are present in either. Therefore, the elements match in functionality and purpose."
+      }
+    }
+  },
+  {
+    "task_id": "java_type_1",
+    "success": false,
+    "error": "Element not found: id=search-input",
+    "task_description": "Type 'collections' into the search box",
+    "timestamp": 1734493417.850256,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/java_type_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to type 'collections' into the search box. In the expected image, the search box shows the text 'collections'. However, in the agent's output, the search box is empty, indicating that the text was not entered as required.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML element matches the expected HTML element perfectly. Both are input elements with the same attributes including id, name, placeholder, autocomplete, role, and class. There is no content or inner HTML to consider in this case. The role attribute indicates that this is a search box, which aligns with the task of typing 'collections' into the search box. Therefore, the element would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "elixir_type_1",
+    "success": false,
+    "error": "Element not found: id=search-input",
+    "task_description": "Type 'phoenix' into the search box",
+    "timestamp": 1734493417.882509,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/elixir_type_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to type 'phoenix' into the search box. In the second image, which is the agent's output, the search box is still empty showing the placeholder text 'Search...'. This indicates that the task of typing 'phoenix' into the search box was not completed.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types are the same, being an input field of type text. The key attributes such as id, class, placeholder, aria-label, autocomplete, and spellcheck are all identical. There is no content or inner HTML to consider in this case, as it's an input field. The role and accessibility attributes are also the same, with the aria-label providing the necessary accessibility information. Therefore, the element would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "typescript_submit_1",
+    "success": false,
+    "error": "Element not found: id=search",
+    "task_description": "Type 'generics' into the search box",
+    "timestamp": 1734493417.8763561,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/typescript_submit_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to type 'generics' into the search box. In the expected image, we see that the term 'generics' has been typed into the search box and search results relevant to 'generics' are displayed. However, in the second image (agent's output), the search box is empty and no search for 'generics' has been conducted.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: Both the expected and actual HTML elements are identical. They are both 'input' elements with the type 'search', and they share the same id, class, and other attributes. The role and accessibility attributes are also the same, which means they would function the same way for users. The style attribute is also identical, ensuring the elements would look the same. Therefore, the actual HTML element matches the expected element in functionality and purpose."
+      }
+    }
+  },
+  {
+    "task_id": "mysql_type_1",
+    "success": false,
+    "error": "Element not found: id=search-input",
+    "task_description": "Type 'indexes' into the search box",
+    "timestamp": 1734493417.850552,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/mysql_type_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task required typing 'indexes' into the search box. In the agent's output image, the search box is empty, indicating that the text 'indexes' was not typed as expected.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types are the same, being an input field of type \"search\". The key attributes such as id, class, placeholder, aria-label, and name are all identical. There is no content or inner HTML to consider in this case, as it's an empty input field. The role and accessibility attributes are also the same, with the aria-label providing the necessary accessibility information. Therefore, the element would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "rust_submit_1",
+    "success": false,
+    "error": "Element not found: id=search",
+    "task_description": "Type 'traits' into the search box and press search",
+    "timestamp": 1734493417.868327,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/rust_submit_1_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The output image does not show that 'traits' has been typed into the search box and searched. Instead, it displays the homepage of the Rust programming language documentation without any indication of a search being performed. This is contrary to the expected result where the search for 'traits' should display relevant search outcomes.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: The provided HTML is an icon element, specifically a search icon from the Font Awesome library. While this icon is often associated with search functionality, it does not inherently provide the functionality required to complete the task. The task requires a form input element for typing 'traits' and a form submission element (like a button) to submit the search. The provided HTML does not include these elements, so it does not match the expected HTML for the task."
+      }
+    }
+  },
+  {
+    "task_id": "typescript_click_1",
+    "success": false,
+    "error": "Element not found: xpath=//a[text()='The_basics']",
+    "task_description": "Click the 'The Basics' link",
+    "timestamp": 1734493417.8551512,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/typescript_click_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click the 'The Basics' link in the TypeScript documentation, which should navigate to a page with detailed content on 'The Basics'. The expected outcome is shown in the first image, where 'The Basics' page contents are displayed. However, the second image shows the documentation overview page without navigating to 'The Basics' page, indicating that the task was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML element matches the expected HTML element perfectly. They are both anchor ('a') tags, which are used for links. The href attributes are identical, meaning they point to the same URL. The visible text within the tags is also the same, \"The Basics\", which is what users would click on. There are no differences in id, class, or other attributes, and no accessibility attributes are specified in either case. Therefore, the actual HTML would function the same way as the expected HTML for users."
+      }
+    }
+  },
+  {
+    "task_id": "typescript_type_1",
+    "success": false,
+    "error": "Element not found: id=search",
+    "task_description": "Type 'interface' into the search box",
+    "timestamp": 1734493417.851684,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/typescript_type_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to type 'interface' into the search box. In the agent's output image, the search box does not display the typed word 'interface', indicating that the task was not completed as specified.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: Both the expected and actual HTML elements are identical. They are both 'input' elements with the type 'search', and they share the same id, class, and other attributes. The role and accessibility attributes are also the same, which means they would function the same way for users. The content serves the same purpose, which is to provide a search box for users to type in. Therefore, the actual HTML element matches the expected element in functionality and purpose."
+      }
+    }
+  },
+  {
+    "task_id": "rust_type_1",
+    "success": false,
+    "error": "Element not found: id=search-input",
+    "task_description": "Type 'ownership' into the search box",
+    "timestamp": 1734493417.850689,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/rust_type_1_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The expected output, as depicted in the first image, shows the search term 'ownership' entered into the search box and the resulting search results are displayed. However, the second image shows the homepage of the Rust programming language website without any indication that the search term 'ownership' was entered or that any search results are displayed, thus failing to complete the task as specified.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: The provided HTML is an icon element, specifically a search icon from the Font Awesome library. This element does not provide a way for users to type 'ownership' into a search box. The expected HTML for this task would be an input element with type=\"search\" or type=\"text\", which allows users to input text. The icon element can be used as a visual cue for the search functionality, but it does not provide the functionality itself."
+      }
+    }
+  },
+  {
+    "task_id": "python_submit_1",
+    "success": false,
+    "error": "Element not found: id=search-input",
+    "task_description": "Type 'dictionary' into the search box and press search",
+    "timestamp": 1734493417.867448,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/python_submit_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to type 'dictionary' into the search box and press search. The expected output should show the search results for 'dictionary' on the Python documentation website. The first image correctly shows the search results after 'dictionary' was searched. However, the second image shows the homepage of the Python 3.13.1 documentation without any indication that the search was performed. Therefore, the agent failed to complete the specified task.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types are the same, being an input field of type \"search\". The key attributes such as placeholder, aria-label, type, name, and id are all identical. There is no content or inner HTML to consider in this case. The role and accessibility attributes are also the same, with the aria-label providing the necessary accessibility support. Therefore, the element would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "cpp_type_1",
+    "success": false,
+    "error": "Element not found: id=searchbox",
+    "task_description": "Type 'vector' into the search box",
+    "timestamp": 1734493417.850015,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/cpp_type_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to type 'vector' into the search box on the website. In the first image (expected), 'vector' is typed into the search box and a drop-down search suggestion appears, indicating it detected a search query entry. However, in the second image (agent's output), there is no visible text 'vector' in the search box, suggesting that the task was not successfully completed.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. Both are input elements with the type set to \"search\" and the name attribute set to \"q\". This means that they would both create a search box where users can type in their queries. There are no differences in the element types, key attributes, content, or accessibility attributes. Therefore, the actual HTML would function the same way as the expected HTML for users."
+      }
+    }
+  },
+  {
+    "task_id": "go_submit_1",
+    "success": false,
+    "error": "Element not found: xpath=//a[text()='Packages']",
+    "task_description": "Click the Packages link",
+    "timestamp": 1734493417.872567,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/go_submit_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click the 'Packages' link. The expected result, as shown in the first image, should display the Packages page of the Go programming site, which focuses on searching and browsing Go packages. However, the output image shows the Documentation section of the website, not the Packages section. Thus, the task was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected and actual HTML elements match perfectly. They are both anchor ('a') tags, which are typically used for links. The href attributes match, meaning they link to the same URL. The aria-label and aria-describedby attributes also match, which means they provide the same accessibility information. The visible text within the tags (\"Packages\") is also the same. Therefore, these elements would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "scala_type_1",
+    "success": false,
+    "error": "Element not found: id=search-input",
+    "task_description": "Type 'traits' into the search box",
+    "timestamp": 1734493417.852431,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/scala_type_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to type 'traits' into the search box. In the agent's output (second image), the search box is empty, indicating that the text was not entered as specified. Therefore, the task was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: Both the expected and actual HTML elements match perfectly. They are both input elements with type \"text\", and they share the same class, id, placeholder, autocomplete, spellcheck, role, aria-autocomplete, aria-expanded, aria-label, aria-owns, dir, and style attributes. There is no difference in their content or inner HTML. The role and accessibility attributes are also identical, ensuring the same functionality for users. Therefore, the actual HTML element would indeed serve the same purpose and function in the same way as the expected HTML element."
+      }
+    }
+  },
+  {
+    "task_id": "haskell_type_1",
+    "success": false,
+    "error": "Element not found: id=search-input",
+    "task_description": "Type 'monads' into the search box",
+    "timestamp": 1734493417.8792262,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/haskell_type_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The agent was supposed to type 'monads' into the search box. In the output image, the search box is still empty, indicating that the agent did not complete the task as expected.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types are the same, being an input field of type text. The key attributes such as id and placeholder are identical. There is no content or inner HTML to consider in this case, and there are no specific role or accessibility attributes provided, but the title attribute serves a similar purpose. The user would be able to type 'monads' into the search box in both cases."
+      }
+    }
+  },
+  {
+    "task_id": "google_search_2",
+    "success": false,
+    "error": "module 'selenium.webdriver.support.expected_conditions' has no attribute 'and_'",
+    "task_description": "Search for 'news today' and press enter",
+    "timestamp": 1734493445.840245,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/google_search_2_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The expected image shows a Google search result page for the query 'news today', indicating that the search was completed successfully. The output image, however, shows the Google homepage without any search query entered into the search bar. This indicates that the task of searching for 'news today' and pressing enter was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. Both the textarea and input elements have the same classes, attributes, and roles. The textarea has the correct value of \"news today\", and the input has the correct type of \"submit\", which means it would function as expected when clicked. The aria-labels are also the same, which is important for accessibility. Therefore, the elements would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "google_search_3",
+    "success": false,
+    "error": "module 'selenium.webdriver.support.expected_conditions' has no attribute 'and_'",
+    "task_description": "Search for 'best schools in san francisco' and press enter",
+    "timestamp": 1734493445.857098,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/google_search_3_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The expected output shows a Google search result page for 'best schools in san francisco', displaying relevant content including listings and links related to the search query. However, the agent's output shows the Google homepage without any search query entered or results displayed. Therefore, the task of searching for 'best schools in san francisco' and pressing enter was not accomplished.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. Both the textarea and input elements are present with the same classes, attributes, and roles. The textarea is used for the user to input their search query and the input element is used to submit the search. The roles and accessibility attributes are also the same, ensuring that the functionality would be the same for all users, including those using assistive technologies."
+      }
+    }
+  },
+  {
+    "task_id": "google_search_1",
+    "success": false,
+    "error": "module 'selenium.webdriver.support.expected_conditions' has no attribute 'and_'",
+    "task_description": "Type 'weather today' and press enter",
+    "timestamp": 1734493445.8363378,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/google_search_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The agent failed to complete the task. The expected result was to type 'weather today' into Google and press enter to display the search results with weather details. The expected result shows the weather search results page for 'Berkeley, CA' with detailed temperature and condition information. However, the output from the agent shows the Google homepage without any search activity, indicating that the agent did not type or submit the query as expected.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML in all the required aspects. Both the textarea and input elements are present with the same attributes. The textarea has the correct value of \"weather today\" and the input has the correct type of \"submit\". The class, aria-label, name, role, and other attributes also match exactly. Therefore, the elements would function the same way for users, allowing them to type 'weather today' and press enter to submit the form."
+      }
+    }
+  },
+  {
+    "task_id": "coursera_business_1",
+    "success": false,
+    "error": "Element not found: id=business-category",
+    "task_description": "Click the For Business category",
+    "timestamp": 1734493445.838652,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/coursera_business_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click on the 'For Business' category, which should ideally lead to a page dedicated to business services offered by Coursera. The expected image demonstrates this with content specifically tailored for business-oriented services. However, the agent's output shows a general homepage of Coursera targeting individual learners, not specifically for business users, and the tab 'For Businesses' is not even highlighted or active. This indicates that the required action was not performed correctly.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected and actual HTML elements match perfectly. They both use the same element type, which is the span tag. The key attributes, such as class, are also identical. The content and inner HTML are the same, reading \"For Businesses\". There are no role and accessibility attributes provided, but since the expected and actual HTML are identical, we can assume they are not required for this task. Therefore, the elements would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "wolfram_integral_1",
+    "success": false,
+    "error": "Element not found: id=query-input",
+    "task_description": "Type 'integrate x^2' and press enter",
+    "timestamp": 1734493445.840044,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/wolfram_integral_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to type 'integrate x^2' and press enter, expecting the computational result similar to that depicted in the first image. The second image, which represents the agent's output, shows the Wolfram Alpha homepage without any input or operations performed, indicating that the task of typing and submitting the query was not completed.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types match, with an input field for typing and a button for submission. The key attributes such as style, enterkeyhint, autocapitalize, aria-label, and class are the same for the input field in both the actual and expected HTML. The button also has matching attributes including type, aria-label, tabindex, aria-describedby, and class. The SVG elements, which likely provide visual elements, also match. The roles and accessibility attributes are the same, ensuring the same functionality for users. Therefore, the actual HTML would serve the same purpose and function in the same way as the expected HTML."
+      }
+    }
+  },
+  {
+    "task_id": "wolfram_derivative_1",
+    "success": false,
+    "error": "Element not found: id=query-input",
+    "task_description": "Type 'derivative of sin(x)' and press enter",
+    "timestamp": 1734493445.8567,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/wolfram_derivative_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task required typing 'derivative of sin(x)' and pressing enter. The first image (expected result) shows that the result should display the derivative calculation and its corresponding plot. However, the second image (agent's output) displays the homepage of Wolfram Alpha with an empty input field, indicating that the agent did not execute the task of entering the text and submitting it.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types match, with an input field for typing and a button for submission. The key attributes such as style, enterkeyhint, autocapitalize, aria-label, and class for the input field, and type, aria-label, tabindex, aria-describedby, and class for the button are all present and identical in both the expected and actual HTML. The SVG elements for visual representation are also identical. The role and accessibility attributes are also the same, ensuring the same functionality for users. Therefore, the actual HTML would serve the same purpose and function the same way for users as the expected HTML."
+      }
+    }
+  },
+  {
+    "task_id": "hf_models_1",
+    "success": false,
+    "error": "Element not found: id=models-tab",
+    "task_description": "Click the Models tab",
+    "timestamp": 1734493445.836551,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/hf_models_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task specified was to click on the 'Models' tab. In the expected image, the 'Models' tab is correctly displayed with the page showing various machine learning models and associated filters. However, in the output image provided by the agent, it appears that the agent is still on the main home page of the platform, which features an overview of the site rather than the specific content of the 'Models' tab. Thus, the task was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types are the same, being an anchor tag (<a>). The key attributes such as class and href are identical. The content, including the SVG and the text \"Models\", is the same in both. The role and accessibility attributes are also the same, with the SVG having aria-hidden=\"true\" and focusable=\"false\". Therefore, the actual HTML would function the same way for users as the expected HTML."
+      }
+    }
+  },
+  {
+    "task_id": "hf_datasets_1",
+    "success": false,
+    "error": "Element not found: id=datasets-tab",
+    "task_description": "Click the Datasets tab",
+    "timestamp": 1734493445.839712,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/hf_datasets_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click on the 'Datasets' tab. The first image shows the 'Datasets' tab active with a listing of datasets, which is the expected outcome. However, the second image indicates that the 'Tasks' tab is currently active, showing different filters and categories related to AI tasks, and not the datasets. Therefore, the task has not been accomplished successfully in the second image.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types are the same, being the 'a' tag. The key attributes such as class and href are identical. The content and inner HTML, including the SVG for the icon and the text 'Datasets', are the same. The role and accessibility attributes are also the same, with the SVG having 'aria-hidden=\"true\"' and 'focusable=\"false\"', making it invisible to screen readers and not focusable, which is appropriate for decorative icons. Therefore, the actual HTML would function the same way for users as the expected HTML."
+      }
+    }
+  },
+  {
+    "task_id": "hf_spaces_1",
+    "success": false,
+    "error": "Element not found: id=spaces-tab",
+    "task_description": "Click the Spaces tab",
+    "timestamp": 1734493445.856162,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/hf_spaces_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click on the 'Spaces' tab. The expected image shows the 'Spaces' tab of the website, indicating it is correctly loaded with various project containers and space details. However, the output image shows the home page of the Hugging Face site rather than the 'Spaces' tab. This indicates that the 'Spaces' tab was not successfully clicked or navigated to, and the task was not completed as specified.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types are the same, being an anchor tag (<a>). The key attributes such as class and href are identical. The content and inner HTML, including the SVG for the icon and the text \"Spaces\", are the same. The role and accessibility attributes are also the same, with the SVG having aria-hidden=\"true\" and focusable=\"false\". Therefore, the actual HTML would function the same way for users as the expected HTML."
+      }
+    }
+  },
+  {
+    "task_id": "flights_origin_1",
+    "success": false,
+    "error": "Element not found: id=origin-input",
+    "task_description": "Type 'LAX' in the Where From",
+    "timestamp": 1734493445.839419,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/flights_origin_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to type 'LAX' in the 'Where From' input field. The expected output shows 'LAX' entered with location suggestions including 'Los Angeles International Airport LAX' displayed. However, in the agent's output, 'San Francisco' is displayed in the 'Where From' field, not 'LAX'. Thus, the task was not completed as specified.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected and actual HTML elements are identical. They are both input elements of type text, with the same attributes and values. The role and accessibility attributes are also the same, indicating that they would function the same way for users. The content serves the same purpose, which is to provide a text input field for users to enter the origin of their journey. Therefore, the actual HTML element matches the expected element in functionality and purpose."
+      }
+    }
+  },
+  {
+    "task_id": "github_repo_1",
+    "success": false,
+    "error": "Element not found: id=pricing-requests-tab",
+    "task_description": "Click the Pricing tab",
+    "timestamp": 1734493445.837454,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/github_repo_1_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click on the Pricing tab. The first image, which is the expected output, clearly shows the Pricing page of the website, with different pricing plans displayed. However, the second image, which is the agent's output, shows the homepage of the website rather than the Pricing page, indicating that the Pricing tab was not successfully clicked.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: The expected and actual HTML elements do not match the task specified. The task is to click the Pricing tab, but both the expected and actual HTML elements are links to a feature called \"GitHub Copilot\". The href attribute in both elements points to \"/features/copilot\", not a Pricing page. The visible text within the elements is \"Try GitHub Copilot\", not \"Pricing\". Therefore, these elements would not allow a user to complete the task as specified."
+      }
+    }
+  },
+  {
+    "task_id": "github_issues_1",
+    "success": false,
+    "error": "Element not found: id=github-copilot-tab",
+    "task_description": "Click the Try Github Copilot button",
+    "timestamp": 1734493445.847473,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/github_issues_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click the 'Try GitHub Copilot' button, but the second image shows that the button was not clicked. Instead, it remains displayed as an option to click, indicating the action tasked was not completed.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML element matches the expected HTML element perfectly. Both are anchor ('a') tags with the same class attributes, href attributes, data-analytics-event attributes, and inner HTML content. The text within the tags is also identical, meaning the button would display the same text to users. Therefore, the actual element would function the same way as the expected element for users, serving the same purpose and providing the same interaction (click to navigate to \"/features/copilot\")."
+      }
+    }
+  },
+  {
+    "task_id": "flights_dest_1",
+    "success": false,
+    "error": "Element not found: id=destination-input",
+    "task_description": "Type 'JFK' in the Where to field",
+    "timestamp": 1734493445.836123,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/flights_dest_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to type 'JFK' in the 'Where to' field on the Google Flights page. The expected image shows 'JFK' correctly typed into this field with 'John F. Kennedy International Airport JFK' selected as the destination. However, in the agent's output image, the 'Where to' field is still empty, indicating that the agent did not successfully complete the task as specified.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected and actual HTML elements are identical. They are both input elements with type=\"text\", which is suitable for a \"Where to\" field where users can type in a location. The role attribute is set to \"combobox\", which indicates that it's a single-line textbox and can pop up a list of possible values in which users can choose one. The aria-label attribute is set to \"Where to? \", which provides an accessible name for the element. The other attributes are also identical, including class, jsname, jsaction, autocomplete, aria-autocomplete, aria-haspopup, aria-expanded, aria-describedby, autofocus, aria-owns, and tabindex. Therefore, the actual HTML element matches the expected element in functionality and purpose."
+      }
+    }
+  },
+  {
+    "task_id": "flights_roundtrip_1",
+    "success": false,
+    "error": "Element not found: id=roundtrip",
+    "task_description": "Click the Round trip option",
+    "timestamp": 1734493445.855436,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/flights_roundtrip_1_after.png",
+    "final_score": 0.8,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 1.0,
+        "explanation": "{\n  \"correctness\": true,\n  \"reason\": \"The second image successfully shows that the 'Round trip' option is selected in the user interface for flight booking. This matches the expected action specified by the task to click and select the 'Round trip' option.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: The provided HTML elements are identical, but they do not seem to be suitable for the task specified. The task is to \"Click the Round trip option\", which suggests that the expected HTML element should be an interactive element like a button, checkbox, or radio button. However, the provided HTML is a div element, which is not inherently interactive. Furthermore, there is no content or inner HTML provided, and no role or accessibility attributes, which makes it unclear how this element could be used to complete the task. The class name \"VfPpkd-aPP78e\" does not provide any clear indication of the element's purpose or functionality."
+      }
+    }
+  },
+  {
+    "task_id": "coursera_search_1",
+    "success": false,
+    "error": "Element not found: id=search-input",
+    "task_description": "Search for 'machine learning' and press enter",
+    "timestamp": 1734493445.8358788,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/coursera_search_1_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The expected result shows a search result page for 'machine learning' courses on Coursera, indicating that the search was successfully executed. However, the agent output shows the Coursera homepage without any search executed, as the search bar is empty without the term 'machine learning' entered or submitted. Therefore, the task of searching for 'machine learning' and pressing enter was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: The actual HTML provided does not include a submit button or a form element that would allow the user to submit their search query. The SVG element appears to be a decorative or icon element, but it does not have a role of \"button\" or any event handlers that would suggest it functions as a submit button. Therefore, the actual HTML would not function the same way for users as the expected HTML for the task of searching for 'machine learning' and pressing enter."
+      }
+    }
+  },
+  {
+    "task_id": "wolfram_calc_1",
+    "success": false,
+    "error": "Element not found: id=query-input",
+    "task_description": "Type '2+2' and press enter",
+    "timestamp": 1734493445.836777,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/wolfram_calc_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to enter '2+2' into the search box and press enter on the Wolfram Alpha website. The expected result was to see the evaluation of '2+2' with an output showing '4' as seen in the first image. However, the second image, which is the agent's output, shows the home page of Wolfram Alpha with no input entered and no calculation performed. The search box is empty, and it is clear that '2+2' was not typed nor submitted, therefore the task was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types match, with an input field for typing and a button for submitting. The key attributes such as 'enterkeyhint', 'autocapitalize', 'aria-label', 'class', 'value', 'style', 'type', 'tabindex', 'aria-describedby' are all present and identical in both the expected and actual HTML. The SVG elements for visual representation are also identical. The role and accessibility attributes are also the same, ensuring the same functionality for all users. Therefore, the actual HTML would serve the same purpose and function in the same way as the expected HTML."
+      }
+    }
+  },
+  {
+    "task_id": "espn_nba_1",
+    "success": false,
+    "error": "Element not found: id=global-nav-nba",
+    "task_description": "Click the NBA section",
+    "timestamp": 1734493445.835546,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/espn_nba_1_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "Evaluation failed: [Errno 2] No such file or directory: 'evaluation/ground_truth/task_152_gt.png'"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Evaluation failed: [Errno 2] No such file or directory: 'evaluation/ground_truth/task_152_gt.png'"
+      }
+    }
+  },
+  {
+    "task_id": "coursera_cs_1",
+    "success": false,
+    "error": "Element not found: id=university-category",
+    "task_description": "Click the For University category",
+    "timestamp": 1734493445.8547552,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/coursera_cs_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click the 'For University' category. The expected image shows the 'For University' category being viewed, which should typically lead to a page focusing on solutions and options for university-related services. However, the output image shows the page for 'For Individuals', noticeable by the header and content focused on learning without limits, which is different from the target category 'For Universities'. Therefore, the task was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. The element types are the same, both being 'span' tags. The key attributes, in this case the class attribute, are identical. The content and inner HTML are also the same, both containing the text \"For Universities\". There are no role and accessibility attributes specified, but since the actual and expected HTML are identical, we can assume they would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "espn_nfl_1",
+    "success": false,
+    "error": "Element not found: id=global-nav-nfl",
+    "task_description": "Click the NFL section",
+    "timestamp": 1734493445.8378408,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/espn_nfl_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click the NFL section on the ESPN website. In the expected image, the webpage is correctly displaying the NFL section with NFL-specific news, game scores, and related content. However, the agent's output shows that it is displaying an NBA-related page with scores and news from basketball games, indicating that the NFL section was not successfully accessed. Therefore, the task was not completed as specified.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML element matches the expected HTML element perfectly. Both are anchor ('a') tags with the same attributes and values, including tabindex, data-track-nav_item, data-track-nav_layer, itemprop, href, and name. The inner HTML content is also identical, with two nested 'span' elements containing the text \"NFL\". This means that the functionality and purpose of the actual HTML element would be the same as the expected one, allowing users to click on the \"NFL\" section as specified."
+      }
+    }
+  },
+  {
+    "task_id": "espn_mlb_1",
+    "success": false,
+    "error": "Element not found: id=global-nav-mlb",
+    "task_description": "Click the MLB section",
+    "timestamp": 1734493445.853554,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/espn_mlb_1_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The second image does not clearly show the MLB section being selected or highlighted, instead it features content from other sports (NBA game scores and news), making it evident that the agent has failed to navigate to and click the MLB section as specified in the task.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: While the expected and actual HTML elements match in terms of element type, key attributes, and content, they do not fulfill the task specified. The task is to click the MLB section, but neither the expected nor the actual HTML elements provide a clickable link. They are both 'span' elements, which are typically used for grouping or applying styles, and do not inherently have interactive functionality. To make a section clickable, an interactive element like 'a' or 'button' should be used. Additionally, there are no role or accessibility attributes present, which are important for web accessibility."
+      }
+    }
+  },
+  {
+    "task_id": "google_search_4",
+    "success": false,
+    "error": "module 'selenium.webdriver.support.expected_conditions' has no attribute 'and_'",
+    "task_description": "Search for 'movies 2024' and press enter",
+    "timestamp": 1734493479.034622,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/google_search_4_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task required the agent to search for 'movies 2024' and press enter. The expected outcome was supposed to show a Google search results page specifically displaying movie details for the year 2024. The second screenshot, which is the agent's output, shows that the agent is still at the Google homepage without having searched for anything. Therefore, the task was not completed successfully as the search for 'movies 2024' was not executed.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. Both the textarea and input elements are present with the same classes, attributes, and roles. The textarea is used for the user to input their search query, and the input element is used to submit the search. The roles and accessibility attributes are also the same, ensuring that the functionality will be identical. The dynamic data-ved attribute is also the same, but even if it were different, it wouldn't affect the overall functionality of the elements."
+      }
+    }
+  },
+  {
+    "task_id": "github_explore_1",
+    "success": false,
+    "error": "module 'selenium.webdriver.support.expected_conditions' has no attribute 'and_'",
+    "task_description": "type 'example@test.com' in the enter your email box and click sign up for GitHub",
+    "timestamp": 1734493479.035744,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/github_explore_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to type 'example@test.com' in the email box and click sign up for GitHub. In the agent's output image, the email box is empty, indicating that the text was not entered as required by the task. Therefore, the task was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected and actual HTML elements match perfectly. They are both input elements of type email with the same class, placeholder, aria-invalid, id, autocomplete, spellcheck, and name attributes. This means they would function identically for users, allowing them to enter an email address. The accessibility attributes are also the same, ensuring that the element is accessible to all users."
+      }
+    }
+  },
+  {
+    "task_id": "flights_oneway_1",
+    "success": false,
+    "error": "Element not found: id=economy",
+    "task_description": "Click the economy option",
+    "timestamp": 1734493479.0332239,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/flights_oneway_1_after.png",
+    "final_score": 0.8,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 1.0,
+        "explanation": "{\n  \"correctness\": true,\n  \"reason\": \"The task was to click the economy option in the flight booking interface, as specified. In both screenshots, the 'Economy' option is selected (highlighted and shown in the dropdown), indicating that the task was completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: The provided HTML elements are div tags with a class attribute. However, there is no indication that these elements are interactive or that they serve the purpose of allowing a user to \"click the economy option\". There is no content or inner HTML provided, and no role or accessibility attributes to suggest that these elements are buttons, links, or any other type of interactive element. Therefore, it cannot be confirmed that these elements would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "github_marketplace_1",
+    "success": false,
+    "error": "Element not found: id=sign-up-tab",
+    "task_description": "Click the sign up",
+    "timestamp": 1734493479.032216,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/github_marketplace_1_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task specified was to click the 'sign up' button. The expected output image displays a prompt where the user is supposed to enter their email to sign up for GitHub. However, the output image shows the main homepage of GitHub with the 'Sign up for GitHub' button still visible, indicating that the 'sign up' button was not clicked as required by the task. Therefore, the agent did not successfully complete the specified task.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: The task specified is to \"Click the sign up\" but the HTML provided does not match this task. The HTML provided is for a Google Search button, not a sign up button. The value attribute which usually provides the button text is \"Google Search\", not \"Sign Up\". Therefore, the actual HTML does not match the expected HTML for the specified task."
+      }
+    }
+  },
+  {
+    "task_id": "hf_search_1",
+    "success": false,
+    "error": "Element not found: id=search-input",
+    "task_description": "Type 'bert' in the search box",
+    "timestamp": 1734493479.033383,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/hf_search_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to type 'bert' in the search box. The first image shows the search box with 'bert' typed in and corresponding search results displayed, indicating the task was completed correctly. However, the second image shows the homepage of the Hugging Face website without anything entered into the search box, suggesting that the task was not executed.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. Both are input elements with type=\"text\", which is the correct element and type for a search box. The class, placeholder, spellcheck, and autocomplete attributes are also identical, meaning the styling and functionality should be the same. There are no id or name attributes specified, so there's no need to match those. The role and accessibility attributes are not explicitly stated, but the input element is inherently accessible to keyboard and screen reader users, so it should be fine in this regard."
+      }
+    }
+  },
+  {
+    "task_id": "wolfram_plot_1",
+    "success": false,
+    "error": "Element not found: id=query-input",
+    "task_description": "Type 'plot sin(x)' and press enter",
+    "timestamp": 1734493479.0341702,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/wolfram_plot_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The expected result was to type 'plot sin(x)' and press enter, resulting in a display of the sine function plot. The second image, however, shows the Wolfram Alpha homepage without the sine function being input or plotted. Thus, the task was not completed as specified.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML matches the expected HTML perfectly. Both have the same element types, namely an input field and a button for submission. The key attributes such as 'enterkeyhint', 'autocapitalize', 'aria-label', 'class', 'type', 'tabindex', and 'aria-describedby' are also identical in both. The content and inner HTML are the same, including the SVG for the button. The role and accessibility attributes are also identical, ensuring the same functionality and accessibility for users. Therefore, the actual HTML would indeed complete the task as specified."
+      }
+    }
+  },
+  {
+    "task_id": "coursera_data_1",
+    "success": false,
+    "error": "Element not found: id=online\u2013degrees-category",
+    "task_description": "Click the online degrees category",
+    "timestamp": 1734493479.0329769,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/coursera_data_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The expected image shows the 'Online Degrees' category page on Coursera with various degree programs visible, indicating that the 'Online Degrees' category has been selected. However, the agent's output image displays the main homepage and does not reflect navigation to the 'Online Degrees' category. Therefore, the task was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML element matches the expected HTML element perfectly. Both are anchor ('a') tags with the same data attributes and values, including the 'href' attribute which is crucial for the link functionality. The class names are also identical, which means the styling applied to the elements will be the same. The inner HTML, \"Online Degrees\", is the same in both elements, which is important for the user to understand the purpose of the link. There are no role or accessibility attributes present, but since both elements are identical, they would function the same way for users."
+      }
+    }
+  },
+  {
+    "task_id": "espn_soccer_1",
+    "success": false,
+    "error": "Element not found: id=global-nav-soccer",
+    "task_description": "Click the Soccer section",
+    "timestamp": 1734493479.035389,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/espn_soccer_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to click on the 'Soccer' section. In the expected image, we see the page for soccer displaying relevant content, including a headline about a soccer match, indicating that the Soccer section was successfully accessed. In the agent's output image, the page is focused on the NBA, showing basketball content and live scores, which suggests that the 'Soccer' section was not clicked, and instead, the page remains on or has navigated to basketball related content.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The actual HTML element matches the expected HTML element perfectly. Both are anchor ('a') tags with the same attributes and values, including tabindex, data-track-nav_item, data-track-nav_layer, itemprop, href, name, and data-icon. The inner HTML content is also identical, with the text \"Soccer\" enclosed in two span tags. This means that the functionality and purpose of the actual HTML element would be the same as the expected one, allowing users to click on the \"Soccer\" section as specified."
+      }
+    }
+  },
+  {
+    "task_id": "espn_nhl_1",
+    "success": false,
+    "error": "Element not found: id=global-nav-nhl",
+    "task_description": "Click the NHL section",
+    "timestamp": 1734493479.032727,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/espn_nhl_1_after.png",
+    "final_score": 0.0,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The agent did not successfully complete the task of clicking the NHL section. The output image shows the ESPN homepage focused on the NBA section rather than the NHL section, as evidenced by the main content and highlights related to NBA instead of NHL.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 0.0,
+        "explanation": "Correctness: False\nReason: While the expected and actual HTML elements match in terms of element type, key attributes, and content, they do not provide the functionality required for the task. The task requires a clickable element to navigate to the NHL section, but a 'span' element is not inherently clickable or focusable. A more appropriate element would be an 'a' (anchor) or 'button' element, which are designed for user interaction and would provide the necessary functionality for this task. Additionally, there are no role or accessibility attributes present, which are important for web accessibility."
+      }
+    }
+  },
+  {
+    "task_id": "github_explore_1",
+    "success": false,
+    "error": "Element not found: id=sign-up-tab",
+    "task_description": "type 'example@test.com' in the enter your email box and click sign up for GitHub",
+    "timestamp": 1734493479.0350668,
+    "after_screenshot": "/Users/dhruvahuja/DOM_and_DOMer/DOMe-and-DOMer-2/results/github_explore_1_after.png",
+    "final_score": 0.2,
+    "llm_evaluations": {
+      "image_similarity": {
+        "score": 0.0,
+        "explanation": "{\n  \"correctness\": false,\n  \"reason\": \"The task was to type 'example@test.com' in the email box and click sign up for GitHub. In the agent's output image, the email box is empty, indicating that the text was not entered as required by the task. Therefore, the task was not completed successfully.\"\n}"
+      },
+      "html_fuzzy_match": {
+        "score": 1.0,
+        "explanation": "Correctness: True\nReason: The expected and actual HTML elements match perfectly. They are both input elements of type email with the same class, placeholder, aria-invalid, id, autocomplete, spellcheck, and name attributes. This means they would function identically for users, allowing them to enter an email address. The accessibility attributes are also the same, ensuring that the element is accessible to all users."
+      }
+    }
+  }
+]

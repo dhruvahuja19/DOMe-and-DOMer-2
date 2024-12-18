@@ -20,6 +20,7 @@ class SerialTaskRunner:
     """Handles serial execution of benchmark tasks"""
     
     def __init__(self,
+                 model,
                  output_dir: Path = None,
                  save_accessibility_tree: bool = True,
                  wait_time: float = 2.0):
@@ -27,10 +28,12 @@ class SerialTaskRunner:
         Initialize SerialTaskRunner
         
         Args:
+            model: Language model to use for task parsing
             output_dir: Directory for results and screenshots
             save_accessibility_tree: Whether to save accessibility trees
             wait_time: Wait time between actions in seconds
         """
+        self.model = model
         self.output_dir = output_dir or Path("results")
         self.save_accessibility_tree = save_accessibility_tree
         self.wait_time = wait_time
@@ -49,92 +52,114 @@ class SerialTaskRunner:
             ]
         )
     
-    def setup_driver(self) -> webdriver.Chrome:
+    def setup_driver(self):
         """Create and configure Chrome WebDriver instance"""
         chrome_options = Options()
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
         chrome_options.add_argument('--force-device-scale-factor=1')
         chrome_options.add_argument('--window-size=1920,1080')
+        chrome_options.add_argument('--disable-gpu')   # Disable GPU hardware acceleration
+        chrome_options.add_argument('--start-maximized')  # Start maximized
+        chrome_options.add_argument('--disable-extensions')  # Disable extensions
+        chrome_options.add_argument('--disable-popup-blocking')  # Disable popup blocking
         chrome_options.add_argument(
-            'user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 '
-            '(KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36'
+            'user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
+            'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.6778.140 Safari/537.36'
         )
         
-        service = Service(ChromeDriverManager().install())
-        return webdriver.Chrome(service=service, options=chrome_options)
+        # Use Selenium Manager instead of ChromeDriverManager
+        service = Service()
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+        
+        # Navigate to about:blank first to ensure a clean start
+        driver.get("about:blank")
+        return driver
     
     def execute_task(self, task: Dict[str, Any], task_num: int, total_tasks: int) -> Dict[str, Any]:
         """Execute a single benchmark task"""
         task_id = task.get('id', 'unknown')
-        logging.info(f"\nProcessing task {task_num}/{total_tasks}: {task_id}")
-        logging.info(f"Task description: {task.get('task', 'No description')}")
+        logging.info(f"\n{'='*50}")
+        logging.info(f"Starting task {task_num}/{total_tasks}: {task_id}")
+        logging.info(f"Task details: {task}")
         
         result = {
             'task_id': task_id,
             'success': False,
             'error': None,
-            'task_description': task.get('task'),
-            'timestamp': time.time()
+            'after_screenshot': None,
+            'llm_evaluations': {
+                'image_similarity': None,
+                'html_fuzzy_match': None
+            }
         }
         
         try:
-            # Navigate to page
+            driver = self.setup_driver()
+            logging.info(f"Browser initialized for task {task_id}")
+            
+            # Navigate to URL
             url = task.get('web')
             if not url:
                 raise ValueError("No URL provided in task")
                 
-            logging.info(f"Task {task_id}: Navigating to {url}")
-            self.driver.get(url)
-            time.sleep(self.wait_time)
-            
-            # Save before screenshot
-            before_screenshot = self.output_dir / f"{task_id}_before.png"
-            save_screenshot(self.driver, str(before_screenshot))
-            result['before_screenshot'] = str(before_screenshot)
-            logging.info(f"Saved before screenshot: {before_screenshot}")
-            
-            # Save accessibility tree before interaction
-            if self.save_accessibility_tree:
-                before_tree = get_accessibility_tree(self.driver)
-                before_tree_path = self.output_dir / f"{task_id}_before_tree.json"
-                save_accessibility_tree(before_tree, str(before_tree_path))
-                result['before_tree'] = str(before_tree_path)
-                logging.info(f"Saved before accessibility tree: {before_tree_path}")
+            logging.info(f"Navigating to URL: {url}")
+            driver.get(url)
+            time.sleep(self.wait_time)  # Wait for page load
             
             # Execute interaction
+            web_interaction = self.model.parse_task(task)
             interaction = {
-                "action": task.get("interaction", "click"),
-                "selector": f"{task['target_element']['type']}={task['target_element']['value']}" if task.get('target_element') else "",
-                "value": task.get("input_text", "")
+                'action': web_interaction.action,
+                'target_element': {
+                    'type': web_interaction.selector_type,
+                    'value': web_interaction.selector_value
+                },
+                'input_text': web_interaction.input_text
             }
             
-            logging.info(f"Executing interaction: {interaction}")
-            success, element_html = execute_interaction(self.driver, interaction)
-            result['success'] = success
+            logging.info(f"Task {task_id}: Executing interaction: {interaction}")
+            success, element_html = execute_interaction(driver, interaction)
+            if not success:
+                raise ValueError("Interaction failed")
             result['html_element'] = element_html
-            time.sleep(self.wait_time)
+            time.sleep(self.wait_time)  # Wait for interaction to complete
             
-            # Save after screenshot
-            after_screenshot = self.output_dir / f"{task_id}_after.png"
-            save_screenshot(self.driver, str(after_screenshot))
-            result['after_screenshot'] = str(after_screenshot)
-            logging.info(f"Saved after screenshot: {after_screenshot}")
+            # Take after screenshot
+            after_screenshot = save_screenshot(driver, self.output_dir / f"{task_id}_after.png")
+            result['after_screenshot'] = after_screenshot
             
-            # Save accessibility tree after interaction
             if self.save_accessibility_tree:
-                after_tree = get_accessibility_tree(self.driver)
-                after_tree_path = self.output_dir / f"{task_id}_after_tree.json"
-                save_accessibility_tree(after_tree, str(after_tree_path))
-                result['after_tree'] = str(after_tree_path)
-                logging.info(f"Saved after accessibility tree: {after_tree_path}")
+                after_tree = get_accessibility_tree(driver)
+                save_accessibility_tree(after_tree, self.output_dir / f"{task_id}_after_tree.json")
+                logging.info("Saved after screenshots and accessibility tree")
             
-            logging.info(f"Task completed successfully: {success}")
-            
+            # Only mark as success if we have all required data
+            if after_screenshot and element_html:
+                # We have the data but need to wait for evaluations to determine final success
+                # Set to False for now, will be updated after evaluations
+                result['success'] = False
+                logging.info(f"Task {task_id} completed data collection")
+            else:
+                result['success'] = False
+                result['error'] = "Missing required data (screenshots or HTML element)"
+        
         except Exception as e:
-            result['error'] = str(e)
-            logging.error(f"Error in task {task_id}: {str(e)}", exc_info=True)
-            
+            error_msg = f"Error in task {task_id}: {str(e)}"
+            logging.error(error_msg, exc_info=True)
+            result['error'] = error_msg
+            result['success'] = False
+        
+        finally:
+            try:
+                if 'driver' in locals():
+                    driver.quit()
+                    logging.info(f"Browser closed for task {task_id}")
+            except Exception as e:
+                logging.error(f"Error closing browser: {str(e)}")
+        
+        logging.info(f"Task {task_id} result: {result}")
+        logging.info(f"{'='*50}\n")
         return result
     
     def run_tasks(self, tasks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -168,6 +193,7 @@ class SerialTaskRunner:
 def run_serial_benchmark(
     tasks_file: str,
     output_dir: str,
+    model,
     save_accessibility_tree: bool = True,
     wait_time: float = 2.0
 ) -> List[Dict[str, Any]]:
@@ -177,11 +203,9 @@ def run_serial_benchmark(
     Args:
         tasks_file: Path to JSONL file containing tasks
         output_dir: Directory for results and screenshots
+        model: Language model to use for task parsing
         save_accessibility_tree: Whether to save accessibility trees
         wait_time: Wait time between actions in seconds
-    
-    Returns:
-        List of task results
     """
     # Load tasks
     tasks = load_tasks_with_ground_truth(tasks_file)
@@ -189,6 +213,7 @@ def run_serial_benchmark(
     
     # Initialize runner
     runner = SerialTaskRunner(
+        model=model,
         output_dir=Path(output_dir),
         save_accessibility_tree=save_accessibility_tree,
         wait_time=wait_time

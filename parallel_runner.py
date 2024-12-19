@@ -1,6 +1,7 @@
 import os
 import time
 import queue
+import logging
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Dict, List, Any, Optional
@@ -20,9 +21,6 @@ from selenium.common.exceptions import (
 )
 from utils import (
     execute_interaction,
-    save_screenshot,
-    get_accessibility_tree,
-    save_accessibility_tree,
     load_tasks_with_ground_truth
 )
 
@@ -33,8 +31,9 @@ class TaskRunner:
                  model,
                  max_workers: int = 4,
                  output_dir: Path = None,
-                 save_accessibility_tree: bool = True,
-                 wait_time: float = 2.0):
+                 wait_time: float = 2.0,
+                 page_load_timeout: int = 300,  # 5 minutes
+                 element_timeout: int = 300):   # 5 minutes
         """
         Initialize TaskRunner
         
@@ -42,17 +41,27 @@ class TaskRunner:
             model: Language model to use for task parsing
             max_workers: Maximum number of concurrent Chrome instances
             output_dir: Directory for results and screenshots
-            save_accessibility_tree: Whether to save accessibility trees
             wait_time: Wait time between actions in seconds
+            page_load_timeout: Timeout for page loads in seconds
+            element_timeout: Timeout for element interactions in seconds
         """
         self.model = model
         self.max_workers = max_workers
-        self.output_dir = output_dir or Path("results")
-        self.save_accessibility_tree = save_accessibility_tree
+        self.output_dir = Path(output_dir) if output_dir else Path.cwd() / "results"
         self.wait_time = wait_time
+        self.page_load_timeout = page_load_timeout
+        self.element_timeout = element_timeout
         
-        # Create output directory
+        # Setup logging
         self.output_dir.mkdir(parents=True, exist_ok=True)
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s - %(levelname)s - %(message)s',
+            handlers=[
+                logging.FileHandler(self.output_dir / "benchmark.log"),
+                logging.StreamHandler()
+            ]
+        )
         
         # Thread-safe queue for results
         self.results_queue = queue.Queue()
@@ -64,10 +73,29 @@ class TaskRunner:
         chrome_options.add_argument('--disable-dev-shm-usage')
         chrome_options.add_argument('--force-device-scale-factor=1')
         chrome_options.add_argument('--window-size=1920,1080')
-        chrome_options.add_argument('--disable-gpu')   # Disable GPU hardware acceleration
-        chrome_options.add_argument('--start-maximized')  # Start maximized
-        chrome_options.add_argument('--disable-extensions')  # Disable extensions
-        chrome_options.add_argument('--disable-popup-blocking')  # Disable popup blocking
+        chrome_options.add_argument('--disable-gpu')
+        chrome_options.add_argument('--start-maximized')
+        chrome_options.add_argument('--disable-extensions')
+        chrome_options.add_argument('--disable-popup-blocking')
+        # Add stability options
+        chrome_options.add_argument('--disable-background-networking')
+        chrome_options.add_argument('--disable-background-timer-throttling')
+        chrome_options.add_argument('--disable-backgrounding-occluded-windows')
+        chrome_options.add_argument('--disable-breakpad')
+        chrome_options.add_argument('--disable-client-side-phishing-detection')
+        chrome_options.add_argument('--disable-default-apps')
+        chrome_options.add_argument('--disable-hang-monitor')
+        chrome_options.add_argument('--disable-prompt-on-repost')
+        chrome_options.add_argument('--disable-sync')
+        chrome_options.add_argument('--disable-web-resources')
+        chrome_options.add_argument('--metrics-recording-only')
+        chrome_options.add_argument('--no-first-run')
+        chrome_options.add_argument('--safebrowsing-disable-auto-update')
+        chrome_options.add_argument('--password-store=basic')
+        chrome_options.add_argument('--use-mock-keychain')
+        chrome_options.add_argument('--disable-renderer-backgrounding')
+        chrome_options.add_argument('--disable-ipc-flooding-protection')
+        
         chrome_options.add_argument(
             'user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
             'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.6778.140 Safari/537.36'
@@ -77,6 +105,11 @@ class TaskRunner:
         service = Service()
         driver = webdriver.Chrome(service=service, options=chrome_options)
         
+        # Set timeouts
+        driver.set_page_load_timeout(300)  # 5 minutes for page load
+        driver.set_script_timeout(300)     # 5 minutes for scripts
+        driver.implicitly_wait(300)        # 5 minutes implicit wait
+        
         # Navigate to about:blank first to ensure a clean start
         driver.get("about:blank")
         return driver
@@ -84,6 +117,8 @@ class TaskRunner:
     def execute_task(self, task: Dict[str, Any]) -> Dict[str, Any]:
         """Execute a single benchmark task"""
         task_id = task.get('id', 'unknown')
+        logging.info(f"Starting task {task_id}")
+        
         result = {
             'task_id': task_id,
             'success': False,
@@ -95,102 +130,115 @@ class TaskRunner:
         driver = None
         try:
             driver = self.setup_driver()
+            logging.info(f"Browser initialized for task {task_id}")
             
             # Navigate to page
             url = task.get('web')  # Changed from 'url' to 'web' to match task data
             if not url:
                 raise ValueError("No URL provided in task")
                 
+            logging.info(f"Navigating to URL: {url}")
             driver.get(url)
             time.sleep(self.wait_time)
             
-            # Save accessibility tree before interaction
-            if self.save_accessibility_tree:
-                before_tree = get_accessibility_tree(driver)
-                before_tree_path = self.output_dir / f"{task_id}_before_tree.json"
-                save_accessibility_tree(before_tree, str(before_tree_path))
-                result['before_tree'] = str(before_tree_path)
+            # Take before screenshot
+            before_screenshot_path = self.output_dir / f"{task_id}_before.png"
+            driver.save_screenshot(str(before_screenshot_path))
+            result['before_screenshot'] = str(before_screenshot_path)
             
-            # Execute interaction
-            web_interaction = self.model.parse_task(task)
-            interaction = {
-                'action': web_interaction.action,
-                'target_element': {
-                    'type': web_interaction.selector_type,
-                    'value': web_interaction.selector_value
-                },
-                'input_text': web_interaction.input_text
+            # Get page HTML and accessibility tree before interaction
+            page_html = driver.page_source
+            
+            # Parse task using model
+            interaction = self.model.parse_task(task, page_html)
+            if not interaction:
+                logging.info(f"Task {task_id}: Model unable to parse task")
+                return result
+                
+            logging.info(f"Task {task_id}: Executing interaction: {interaction}")
+            
+            # Create target element dict from interaction
+            target_element = {
+                'type': interaction.selector_type,
+                'value': interaction.selector_value
             }
             
-            interaction_result = execute_interaction(driver, interaction['action'], interaction['target_element'], interaction['input_text'])
+            interaction_result = execute_interaction(
+                driver, 
+                interaction.action, 
+                target_element, 
+                interaction.input_text, 
+                timeout=self.element_timeout
+            )
             if interaction_result['success']:
                 result['success'] = True
                 result['html_element'] = interaction_result['html_element']
             else:
                 result['error'] = interaction_result['error']
-            time.sleep(self.wait_time)
+                return result
             
-            # Save after screenshot
-            after_screenshot = self.output_dir / f"{task_id}_after.png"
-            save_screenshot(driver, str(after_screenshot))
-            result['after_screenshot'] = str(after_screenshot)
-            
-            # Save accessibility tree after interaction
-            if self.save_accessibility_tree:
-                after_tree = get_accessibility_tree(driver)
-                after_tree_path = self.output_dir / f"{task_id}_after_tree.json"
-                save_accessibility_tree(after_tree, str(after_tree_path))
-                result['after_tree'] = str(after_tree_path)
+            # Take after screenshot
+            time.sleep(self.wait_time)  # Wait for any animations/changes to complete
+            after_screenshot_path = self.output_dir / f"{task_id}_after.png"
+            driver.save_screenshot(str(after_screenshot_path))
+            result['after_screenshot'] = str(after_screenshot_path)
             
         except Exception as e:
+            error_msg = f"Error executing task {task_id}: {str(e)}"
+            logging.error(error_msg, exc_info=True)
             result['error'] = str(e)
             
         finally:
             if driver:
-                driver.quit()
-            
+                try:
+                    driver.quit()
+                    logging.info(f"Browser closed for task {task_id}")
+                except Exception as e:
+                    logging.error(f"Error closing browser for task {task_id}: {str(e)}")
+                    
         return result
     
     def run_tasks(self, tasks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Run tasks in parallel using ThreadPoolExecutor"""
+        
         results = []
         
         # Process tasks in smaller batches to avoid overwhelming the system
-        batch_size = min(self.max_workers, 20)  # Process at most 5 tasks at a time
-        for i in range(0, len(tasks), batch_size):
+        batch_size = self.max_workers # Process at most 5 tasks at a time
+        total_tasks = len(tasks)
+        logging.info(f"Starting parallel execution of {total_tasks} tasks with {self.max_workers} workers")
+        
+        for i in range(0, total_tasks, batch_size):
             batch = tasks[i:i + batch_size]
+            batch_num = i // batch_size + 1
+            total_batches = (total_tasks + batch_size - 1) // batch_size
+            logging.info(f"Processing batch {batch_num}/{total_batches} ({len(batch)} tasks)")
             
             with ThreadPoolExecutor(max_workers=batch_size) as executor:
-                # Submit batch of tasks
                 future_to_task = {
                     executor.submit(self.execute_task, task): task
                     for task in batch
                 }
                 
-                # Process completed tasks
                 for future in as_completed(future_to_task):
                     task = future_to_task[future]
-                    task_id = task.get('id', 'unknown')
                     try:
-                        result = future.result(timeout=120)  # 2 minute timeout per task
+                        result = future.result()
                         results.append(result)
+                        logging.info(f"Task {task.get('id', 'unknown')} completed with success={result['success']}")
                     except Exception as e:
-                        error_msg = f"Task {task_id} failed with error: {str(e)}"
+                        error_msg = f"Error processing task {task.get('id', 'unknown')}: {str(e)}"
+                        logging.error(error_msg, exc_info=True)
                         results.append({
-                            'task_id': task_id,
-                            'success': False,
-                            'error': error_msg,
-                            'task_description': task.get('task'),
-                            'timestamp': time.time()
+                            "task_id": task.get("id", "unknown"),
+                            "success": False,
+                            "error": str(e)
                         })
-            
-            # Add a small delay between batches
-            if i + batch_size < len(tasks):
-                time.sleep(1)
         
+        logging.info(f"Completed all {total_tasks} tasks")
         return results
 
-def execute_interaction(driver, interaction_type, target_element, input_text=None, timeout=10):
+def execute_interaction(driver, interaction_type, target_element, input_text=None, timeout=15):
     """Execute a single interaction with better error handling and logging"""
     selector_type = target_element.get("type")
     selector_value = target_element.get("value")
@@ -278,8 +326,9 @@ def run_parallel_benchmark(
     output_dir: str,
     model,
     max_workers: int = 4,
-    save_accessibility_tree: bool = True,
-    wait_time: float = 2.0
+    wait_time: float = 2.0,
+    page_load_timeout: int = 300,  # 5 minutes
+    element_timeout: int = 300     # 5 minutes
 ) -> List[Dict[str, Any]]:
     """
     Run benchmark tasks in parallel
@@ -289,8 +338,9 @@ def run_parallel_benchmark(
         output_dir: Directory for results and screenshots
         model: Language model to use for task parsing
         max_workers: Maximum number of concurrent Chrome instances
-        save_accessibility_tree: Whether to save accessibility trees
         wait_time: Wait time between actions in seconds
+        page_load_timeout: Timeout for page loads in seconds
+        element_timeout: Timeout for element interactions in seconds
     
     Returns:
         List of task results
@@ -303,8 +353,9 @@ def run_parallel_benchmark(
         model=model,
         max_workers=max_workers,
         output_dir=Path(output_dir),
-        save_accessibility_tree=save_accessibility_tree,
-        wait_time=wait_time
+        wait_time=wait_time,
+        page_load_timeout=page_load_timeout,
+        element_timeout=element_timeout
     )
     
     # Run tasks and return results

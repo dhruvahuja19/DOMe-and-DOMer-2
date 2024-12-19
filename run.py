@@ -6,16 +6,29 @@ from serial_runner import run_serial_benchmark
 from evaluation.auto_eval import run_evaluation
 from models import GPT4Model, ClaudeModel, GeminiModel
 import os
+import time
+import logging
 from dotenv import load_dotenv
 
 def get_model(model_name):
     """Get the appropriate model based on command line argument."""
     load_dotenv()
     
+    # Validate API keys exist
+    api_keys = {
+        'gpt4': ('OPENAI_API_KEY', os.getenv("OPENAI_API_KEY")),
+        'claude': ('ANTHROPIC_API_KEY', os.getenv("ANTHROPIC_API_KEY")),
+        'gemini': ('GOOGLE_API_KEY', os.getenv("GOOGLE_API_KEY"))
+    }
+    
+    key_name, api_key = api_keys[model_name]
+    if not api_key:
+        raise ValueError(f"Missing {key_name} in environment variables. Please set it in your .env file.")
+    
     models = {
-        'gpt4': lambda: GPT4Model(api_key=os.getenv("OPENAI_API_KEY")),
-        'claude': lambda: ClaudeModel(api_key=os.getenv("ANTHROPIC_API_KEY"), model_config={}),
-        'gemini': lambda: GeminiModel(api_key=os.getenv("GOOGLE_API_KEY"), model_config={})
+        'gpt4': lambda: GPT4Model(api_key=api_key),
+        'claude': lambda: ClaudeModel(api_key=api_key, model_config={}),
+        'gemini': lambda: GeminiModel(api_key=api_key, model_config={})
     }
     
     if model_name not in models:
@@ -30,7 +43,6 @@ def main():
     parser.add_argument('--max-workers', type=int, default=4, help='Number of parallel workers (only for parallel mode)')
     parser.add_argument('--mode', type=str, choices=['serial', 'parallel'], default='parallel',
                        help='Run tasks serially or in parallel')
-    parser.add_argument('--save-accessibility-tree', action='store_true', help='Save accessibility trees for each task')
     parser.add_argument('--wait-time', type=float, default=2.0, help='Wait time between actions in seconds')
     parser.add_argument('--evaluate', action='store_true', help='Run evaluation after benchmark')
     parser.add_argument('--evaluate-mode', type=str, choices=['serial', 'parallel'], default='parallel',
@@ -39,12 +51,12 @@ def main():
     
     args = parser.parse_args()
     
-    # Initialize the selected model
-    model = get_model(args.model)
-    
-    # Create output directory
+    # Create output directory if it doesn't exist
     output_dir = Path(args.output)
     output_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Initialize the selected model
+    model = get_model(args.model)
     
     # Run benchmark based on mode
     if args.mode == 'parallel':
@@ -52,7 +64,6 @@ def main():
             tasks_file=args.tasks,
             output_dir=str(output_dir),
             max_workers=args.max_workers,
-            save_accessibility_tree=args.save_accessibility_tree,
             wait_time=args.wait_time,
             model=model
         )
@@ -60,7 +71,6 @@ def main():
         results = run_serial_benchmark(
             tasks_file=args.tasks,
             output_dir=str(output_dir),
-            save_accessibility_tree=args.save_accessibility_tree,
             wait_time=args.wait_time,
             model=model
         )

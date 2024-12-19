@@ -43,11 +43,12 @@ class BaseModel(ABC):
         self.model_config = model_config
         
     @abstractmethod
-    def parse_task(self, task: Dict[str, Any]) -> WebInteraction:
+    def parse_task(self, task: Dict[str, Any], page_html: str = None) -> WebInteraction:
         """Parse a task definition into a web interaction instruction.
         
         Args:
             task: Task definition from dom_tasks.jsonl
+            page_html: Current page HTML to help with element selection
             
         Returns:
             WebInteraction object with parsed instructions

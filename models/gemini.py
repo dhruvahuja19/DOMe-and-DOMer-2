@@ -13,13 +13,15 @@ from .gemini_function_parser import FunctionParser
 class GeminiModel(BaseModel):
     """Gemini model implementation for the DOM benchmark."""
     
-    def __init__(self, api_key: str, model_config: Dict[str, Any] = None):
-        super().__init__("gemini-1.5-pro", model_config or {})
+    def __init__(self, api_key: str = None, model_config: Dict[str, Any] = None):
+        """Initialize GeminiModel."""
+        super().__init__("gemini-pro", model_config or {})
+        
+        # Configure Gemini API
         genai.configure(api_key=api_key)
         self.model = genai.GenerativeModel('gemini-1.5-pro')
         self.max_retries = 10
-        self.temperature = model_config.get("temperature", 0)
-        self.max_tokens = 32000
+        self.temperature = 0
         # Use GPT-4 tokenizer as an approximation since Gemini uses similar tokenization
         self.tokenizer = tiktoken.encoding_for_model("gpt-4")
         self.function_parser = FunctionParser()
@@ -63,62 +65,65 @@ If you need to perform additional actions, use the following format:
 </args>"""
 
     def _clean_html(self, html: str) -> str:
-        """Remove all JavaScript and CSS from HTML to reduce size."""
-        # First use BeautifulSoup for robust HTML parsing
+        """Keep only relevant semantic HTML elements and attributes for content analysis."""
+        # Count tokens before cleaning
+        tokenizer = genai.GenerativeModel("gemini-pro").count_tokens
+        initial_tokens = tokenizer(html).total_tokens
+        print(f"[Gemini] Initial HTML context length: {initial_tokens} tokens")
+        
+        # Use BeautifulSoup for robust HTML parsing
         soup = BeautifulSoup(html, "html.parser")
         
-        # Remove script tags and their contents
-        for script in soup.find_all('script'):
-            script.decompose()
+        # Define elements we want to keep
+        allowed_elements = {
+            # Text content elements
+            'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+            'ul', 'ol', 'li', 'a', 'table', 'tr', 'td', 'th',
+            'div', 'span', 'strong', 'em', 'code', 'pre',
+            'blockquote', 'article', 'section', 'main',
+            
+            # Interactive elements
+            'button', 'input', 'select', 'option', 'textarea', 'form',
+            'label', 'fieldset', 'legend', 'datalist', 'output',
+            
+            # Media elements that might be clickable
+            'img', 'svg', 'canvas', 'video', 'audio',
+            
+            # Navigation elements
+            'nav', 'header', 'footer', 'menu', 'menuitem',
+            
+            # Interactive containers
+            'dialog', 'details', 'summary'
+        }
         
-        # Remove style tags and their contents
-        for style in soup.find_all('style'):
-            style.decompose()
-            
-        # Remove link tags for stylesheets
-        for link in soup.find_all('link', rel="stylesheet"):
-            link.decompose()
-            
-        # Remove all style attributes
-        for tag in soup.find_all():
-            if tag.has_attr('style'):
-                del tag['style']
+        # Define attributes we want to keep
+        allowed_attributes = {
+            'a': ['href', 'title'],
+            'img': ['alt', 'src'],
+            '*': ['id', 'class']  # Allow these on any element
+        }
+        
+        # Function to clean a tag
+        def clean_tag(tag):
+            if tag.name not in allowed_elements:
+                tag.unwrap()  # Keep content but remove the tag
+                return
                 
-        # Get the cleaned HTML
+            # Remove all attributes except allowed ones
+            allowed_for_tag = allowed_attributes.get(tag.name, []) + allowed_attributes['*']
+            attrs = dict(tag.attrs)  # Create a copy since we're modifying
+            for attr in attrs:
+                if attr not in allowed_for_tag:
+                    del tag[attr]
+        
+        # Clean all tags in the document
+        for tag in soup.find_all(True):
+            clean_tag(tag)
+            
         cleaned_html = str(soup)
-        
-        # Additional regex-based cleaning for things BeautifulSoup might miss
-        # Remove noscript tags and their contents
-        cleaned_html = re.sub(r'<noscript\b[^<]*(?:(?!<\/noscript>)<[^<]*)*<\/noscript>', '', cleaned_html)
-        
-        # Remove template tags (often used by JS frameworks)
-        cleaned_html = re.sub(r'<template\b[^<]*(?:(?!<\/template>)<[^<]*)*<\/template>', '', cleaned_html)
-        
-        # Remove preloaded resources
-        cleaned_html = re.sub(r'<link[^>]*rel="preload"[^>]*>', '', cleaned_html)
-        
-        # Remove meta tags with CSS/JS content
-        cleaned_html = re.sub(r'<meta[^>]*http-equiv="Content-Style-Type"[^>]*>', '', cleaned_html)
-        cleaned_html = re.sub(r'<meta[^>]*http-equiv="Content-Script-Type"[^>]*>', '', cleaned_html)
-        
-        # Remove inline event handlers
-        cleaned_html = re.sub(r'\son\w+="[^"]*"', '', cleaned_html)
-        
-        # Remove javascript: URLs
-        cleaned_html = re.sub(r'href="javascript:[^"]*"', '', cleaned_html)
-        
-        # Remove data attributes (often used for JS functionality)
-        cleaned_html = re.sub(r'\sdata-[a-zA-Z0-9\-_]+="[^"]*"', '', cleaned_html)
-        
-        # Remove framework-specific attributes
-        cleaned_html = re.sub(r'\s(?:ng|v|x)-[a-zA-Z0-9\-_]+="[^"]*"', '', cleaned_html)
-        
-        # Remove old-style HTML styling attributes
-        attrs_to_remove = ['align', 'bgcolor', 'border', 'cellpadding', 'cellspacing', 
-                          'color', 'face', 'height', 'hspace', 'marginheight', 'marginwidth',
-                          'size', 'valign', 'vspace', 'width']
-        for attr in attrs_to_remove:
-            cleaned_html = re.sub(fr'\s{attr}="[^"]*"', '', cleaned_html)
+        final_tokens = tokenizer(cleaned_html).total_tokens
+        print(f"[Gemini] Final HTML context length: {final_tokens} tokens")
+        print(f"[Gemini] Reduced by: {initial_tokens - final_tokens} tokens ({((initial_tokens - final_tokens) / initial_tokens * 100):.1f}%)")
         
         return cleaned_html
 
@@ -126,26 +131,26 @@ If you need to perform additional actions, use the following format:
         """Helper method to call Gemini API with retry logic."""
         try:
             # Convert messages to Gemini format
-            prompt = ""
+            gemini_messages = []
             for msg in messages:
-                role_prefix = "System: " if msg["role"] == "system" else "User: " if msg["role"] == "user" else "Assistant: "
-                prompt += f"{role_prefix}{msg['content']}\n\n"
-
-            # Add explicit instruction for JSON output
-            prompt += "\nPlease respond with a valid JSON object following the specified format."
-
+                if msg["role"] == "system":
+                    # Prepend system message to user message since Gemini doesn't support system
+                    continue
+                elif msg["role"] == "user":
+                    gemini_messages.append(msg["content"])
+                elif msg["role"] == "assistant":
+                    gemini_messages.append(msg["content"])
+            
+            # Join all messages with newlines
+            prompt = "\n".join(gemini_messages)
+            
+            # Make API call
             response = self.model.generate_content(
                 prompt,
                 generation_config=genai.types.GenerationConfig(
-                    temperature=self.temperature,
-                    max_output_tokens=self.max_tokens
+                    temperature=self.temperature
                 )
             )
-            
-            # Ensure the response was generated successfully
-            if not response.parts:
-                raise Exception("Empty response from Gemini")
-                
             return response, False
         except Exception as e:
             if any(err in str(e).lower() for err in ["too_long", "length", "token limit"]):

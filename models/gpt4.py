@@ -11,6 +11,21 @@ from openai import OpenAI
 from bs4 import BeautifulSoup
 from .base import BaseModel, WebInteraction, TaskResult
 
+class RequestPool:
+    def __init__(self, max_requests_per_minute=3500):
+        self.requests = []
+        self.max_requests = max_requests_per_minute
+        self.window = 60  # 1 minute window
+
+    def can_make_request(self):
+        now = time.time()
+        # Remove old requests
+        self.requests = [t for t in self.requests if now - t < self.window]
+        return len(self.requests) < self.max_requests
+
+    def add_request(self):
+        self.requests.append(time.time())
+
 class GPT4Model(BaseModel):
     """GPT-4 model implementation for the DOM benchmark."""
     
@@ -22,9 +37,10 @@ class GPT4Model(BaseModel):
         
         self.client = OpenAI(api_key=self.api_key)
         self.max_retries = 10
-        self.model = "gpt-4"  # Switched to gpt-4 model
+        self.model = "gpt-4-turbo"  # Switched to gpt-4 model
         self.temperature = 0
-        self.tokenizer = tiktoken.encoding_for_model("gpt-4")
+        self.tokenizer = tiktoken.encoding_for_model("gpt-4-turbo")
+        self.request_pool = RequestPool()  # Add request pooling
         
         # Setup logging for skipped tasks
         self.output_dir = Path("results/skipped_tasks")
@@ -39,35 +55,44 @@ class GPT4Model(BaseModel):
         self.system_prompt = """You are an AI assistant that helps users interact with web elements.
 Your task is to understand the user's intent and generate precise web element interactions.
 
-For each task, analyze:
-1. The user's goal and required interaction (click, type, hover)
-2. The target element's properties and accessibility
-3. Any constraints or special conditions
+IMPORTANT: You MUST respond with ONLY a valid JSON object. No other text, explanations, or formatting.
+The JSON object MUST follow this exact schema:
+{
+    "action": "click" | "type" | "hover",
+    "selector_type": "css" | "xpath" | "id" | "class",
+    "selector_value": "string",
+    "input_text": "string"  // Only required for type actions
+}
 
-Key Guidelines:
+Guidelines for generating selectors:
 1. Prefer stable selectors (id, unique class names) over dynamic ones
 2. Consider element visibility and interactability
 3. Handle dynamic content and loading states
 4. Pay attention to timing and wait states
 
-Generate interactions in this JSON format:
+Example valid response:
 {
-    "action": "click|type|hover",
-    "selector_type": "css|xpath|id|class",
-    "selector_value": "string",
-    "input_text": "string",  # For type actions
-    "description": "string"  # Optional description of the interaction
+    "action": "click",
+    "selector_type": "css",
+    "selector_value": "#submit-button",
+    "input_text": null
 }"""
 
     def _call_api(self, messages: list, retry_count: int = 0) -> Tuple[Optional[dict], bool]:
         """Helper method to call OpenAI API with retry logic."""
+        if not self.request_pool.can_make_request():
+            wait_time = 1
+            print(f"Rate limit exceeded, waiting {wait_time}s before retrying.")
+            time.sleep(wait_time)
+            return self._call_api(messages, retry_count)
+        
         try:
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=messages,
-                temperature=self.temperature,
-                max_tokens=self.max_tokens
+                temperature=self.temperature
             )
+            self.request_pool.add_request()
             return response, False
         except Exception as e:
             if retry_count >= self.max_retries:
@@ -77,7 +102,7 @@ Generate interactions in this JSON format:
             wait_time = min(2 ** retry_count, 60)  # Exponential backoff
             if hasattr(e, "__class__"):
                 if e.__class__.__name__ == "RateLimitError":
-                    wait_time = max(wait_time, 10)
+                    wait_time = max(wait_time, 10)  # Back to original wait time
                 elif e.__class__.__name__ == "APIError":
                     wait_time = max(wait_time, 15)
                 
@@ -86,134 +111,142 @@ Generate interactions in this JSON format:
             return self._call_api(messages, retry_count + 1)
         
     def _clean_html(self, html: str) -> str:
-        """Aggressively clean and truncate HTML to reduce size while keeping key elements."""
-        # First use BeautifulSoup for robust HTML parsing
+        """Keep only relevant semantic HTML elements and attributes for content analysis."""
+        # Count tokens before cleaning
+        initial_tokens = len(self.tokenizer.encode(html))
+        print(f"[GPT-4] Initial HTML context length: {initial_tokens} tokens")
+        
+        # Use BeautifulSoup for robust HTML parsing
         soup = BeautifulSoup(html, "html.parser")
         
-        # Remove all tags except those needed for interaction
-        keep_tags = {'input', 'button', 'a', 'select', 'textarea', 'form', 'label'}
-        for tag in soup.find_all():
-            if tag.name not in keep_tags:
-                # Keep the text content but remove the tag
-                tag.replace_with(tag.get_text(' ', strip=True))
+        # Define elements we want to keep
+        allowed_elements = {
+            # Text content elements
+            'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+            'ul', 'ol', 'li', 'a', 'table', 'tr', 'td', 'th',
+            'div', 'span', 'strong', 'em', 'code', 'pre',
+            'blockquote', 'article', 'section', 'main',
+            
+            # Interactive elements
+            'button', 'input', 'select', 'option', 'textarea', 'form',
+            'label', 'fieldset', 'legend', 'datalist', 'output',
+            
+            # Media elements that might be clickable
+            'img', 'svg', 'canvas', 'video', 'audio',
+            
+            # Navigation elements
+            'nav', 'header', 'footer', 'menu', 'menuitem',
+            
+            # Interactive containers
+            'dialog', 'details', 'summary'
+        }
         
-        # Keep only essential attributes
-        essential_attrs = {'id', 'class', 'name', 'type', 'value', 'href', 'role', 'aria-label'}
-        for tag in soup.find_all():
+        # Define attributes we want to keep
+        allowed_attributes = {
+            'a': ['href', 'title'],
+            'img': ['alt', 'src'],
+            '*': ['id', 'class']  # Allow these on any element
+        }
+        
+        # Function to clean a tag
+        def clean_tag(tag):
+            if tag.name not in allowed_elements:
+                tag.unwrap()  # Keep content but remove the tag
+                return
+                
+            # Remove all attributes except allowed ones
+            allowed_for_tag = allowed_attributes.get(tag.name, []) + allowed_attributes['*']
             attrs = dict(tag.attrs)  # Create a copy since we're modifying
             for attr in attrs:
-                if attr not in essential_attrs:
+                if attr not in allowed_for_tag:
                     del tag[attr]
-                elif attr == 'class':  # Truncate long class names
-                    classes = tag['class'][:2] if isinstance(tag['class'], list) else tag['class'].split()[:2]
-                    tag['class'] = ' '.join(classes)
         
-        # Get the cleaned HTML
+        # Clean all tags in the document
+        for tag in soup.find_all(True):
+            clean_tag(tag)
+            
         cleaned_html = str(soup)
-        
-        # Remove extra whitespace and newlines
-        cleaned_html = ' '.join(cleaned_html.split())
-        
-        # Truncate very long attribute values
-        cleaned_html = re.sub(r'((?:id|class|name)="[^"]{30})[^"]*"', r'\1..."', cleaned_html)
-        
-        # Remove empty or whitespace-only text nodes
-        cleaned_html = re.sub(r'>\s+<', '><', cleaned_html)
+        final_tokens = len(self.tokenizer.encode(cleaned_html))
+        print(f"[GPT-4] Final HTML context length: {final_tokens} tokens")
+        print(f"[GPT-4] Reduced by: {initial_tokens - final_tokens} tokens ({((initial_tokens - final_tokens) / initial_tokens * 100):.1f}%)")
         
         return cleaned_html
 
     def parse_task(self, task: Dict[str, Any], page_html: str = None) -> Optional[WebInteraction]:
         """Parse task using GPT-4 to understand the interaction."""
+        # Clean HTML if provided
         if page_html:
             page_html = self._clean_html(page_html)
             
-        # Construct messages
         messages = [
             {"role": "system", "content": self.system_prompt},
-            {"role": "user", "content": f"""Task Description: {task['task']}
+            {"role": "user", "content": f"""Task: {task['task']}
 Current Page HTML: {page_html if page_html else 'Not available'}
 
-Based on the task description and current page HTML:
-1. Determine the type of interaction needed (click, type, hover)
-2. Identify the target element using the most reliable selector
-3. Extract any input text if needed for type interactions"""}
+Based on the task description and current page HTML, generate a web interaction as a JSON object."""}
         ]
         
-        # Check total token count before making API call
-        total_tokens = sum(len(self.tokenizer.encode(msg["content"])) for msg in messages)
-        if total_tokens > 128000:  # GPT-4 Turbo's context limit
-            self.skipped_logger.info(
-                f"Task skipped due to length - URL: {task.get('url', 'N/A')}, "
-                f"Task: {task.get('task', 'N/A')}, "
-                f"Token count: {total_tokens} (limit: 128000)"
-            )
-            return None  # Skip the task instead of using ground truth
-            
-        response, error = self._call_api(messages)
-        if error or not response:
-            return None  # Skip on API errors instead of using ground truth
-            
         try:
-            content = response.choices[0].message.content
-            interaction_data = json.loads(content)
+            # Wait for rate limit if needed
+            while not self.request_pool.can_make_request():
+                time.sleep(1)
+            self.request_pool.add_request()
             
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                temperature=self.temperature,
+                response_format={"type": "json_object"}
+            )
+            
+            interaction_data = json.loads(response.choices[0].message.content)
             return WebInteraction(
-                action=interaction_data.get('action', task.get('interaction', 'click')).lower(),
-                selector_type=interaction_data.get('selector_type', task['target_element']['type']).lower(),
-                selector_value=interaction_data.get('selector_value', task['target_element']['value']),
-                input_text=interaction_data.get('input_text', task.get('input_text')),
-                description=task.get('task')
+                action=interaction_data.get('action', 'click'),
+                selector_type=interaction_data.get('selector_type', 'css'),
+                selector_value=interaction_data.get('selector_value'),
+                input_text=interaction_data.get('input_text'),
+                description=task['task']
             )
         except Exception as e:
-            print(f"Error parsing GPT-4 response: {str(e)}")
-            return self._create_fallback_interaction(task)
-    
+            print(f"Error in GPT-4 task parsing: {str(e)}")
+            return None
+
     def _create_fallback_interaction(self, task: Dict[str, Any]) -> Optional[WebInteraction]:
         """Create a fallback interaction when API calls or parsing fails."""
         # Don't use ground truth, just skip the task
         return None
     
     def handle_error(self, task: Dict[str, Any], error: str) -> Optional[WebInteraction]:
-        """Use GPT-4 to understand and handle errors with enhanced error analysis."""
-        prompt = f"""Task: {task['task']}
-Original Error: {error}
-Previous Interaction: {json.dumps(task.get('previous_interaction', {}), indent=2)}
+        """Use GPT-4 to understand and handle errors."""
+        error_prompt = f"""Task: {task['task']}
+Error: {error}
 
-Analyze the error and suggest a solution considering:
-1. Is this a timing/loading issue?
-2. Is the selector still valid?
-3. Is the element interactive?
-4. For hover: is the element hoverable?
-5. Are there any prerequisite steps missing?
+Based on the task and error message, suggest a new web interaction that might work better.
+Respond with a JSON object following the same schema as before."""
 
-Generate a modified interaction as a JSON object or respond with "GIVE UP" if unrecoverable."""
-
-        messages = [
-            {"role": "system", "content": self.system_prompt},
-            {"role": "user", "content": prompt}
-        ]
-        
-        response, api_error = self._call_api(messages)
-        if api_error or not response:
-            return self.parse_task(task)
-            
-        content = response.choices[0].message.content
-        if content.strip() == "GIVE UP":
-            return None
-            
         try:
-            interaction_data = json.loads(content)
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": self.system_prompt},
+                    {"role": "user", "content": error_prompt}
+                ],
+                temperature=self.temperature,
+                response_format={"type": "json_object"}
+            )
+            
+            interaction_data = json.loads(response.choices[0].message.content)
             return WebInteraction(
-                action=interaction_data['action'],
-                selector_type=interaction_data['selector_type'],
-                selector_value=interaction_data['selector_value'],
+                action=interaction_data.get('action', 'click'),
+                selector_type=interaction_data.get('selector_type', 'css'),
+                selector_value=interaction_data.get('selector_value'),
                 input_text=interaction_data.get('input_text'),
-                description=f"Error recovery: {task['task']}"
+                description=task['task']
             )
         except Exception as e:
-            print(f"Error in error handling: {str(e)}")
-            return self.parse_task(task)
-    
+            print(f"Error in GPT-4 error handling: {str(e)}")
+            return None
+
     def validate_result(self, task: Dict[str, Any], result: TaskResult) -> bool:
         """Enhanced validation using GPT-4 with detailed success criteria."""
         if result.error:
@@ -254,104 +287,3 @@ Respond with:
             if failure_reason:
                 print(f"Validation failed: {failure_reason}")
             return False
-
-    def evaluate_image_similarity(self, actual_img: str, expected_img: str) -> Dict[str, Any]:
-        """
-        Evaluate similarity between actual and expected screenshots
-        
-        Args:
-            actual_img: Path to actual screenshot
-            expected_img: Path to expected (ground truth) screenshot
-            
-        Returns:
-            Dict containing similarity score and explanation
-        """
-        try:
-            # Load images
-            with open(actual_img, "rb") as actual, open(expected_img, "rb") as expected:
-                response = self.client.chat.completions.create(
-                    model="gpt-4o",
-                    messages=[
-                        {
-                            "role": "system",
-                            "content": "You are an expert at comparing web page screenshots to determine if the same interaction was performed."
-                        },
-                        {
-                            "role": "user",
-                            "content": [
-                                {
-                                    "type": "text",
-                                    "text": "Compare these two screenshots and determine if they show the same web interaction was performed. Focus on the relevant UI changes, not minor visual differences."
-                                },
-                                {
-                                    "type": "image_url",
-                                    "image_url": {"url": f"data:image/png;base64,{base64.b64encode(actual.read()).decode()}"}
-                                },
-                                {
-                                    "type": "image_url",
-                                    "image_url": {"url": f"data:image/png;base64,{base64.b64encode(expected.read()).decode()}"}
-                                }
-                            ]
-                        }
-                    ],
-                    max_tokens=300
-                )
-                
-            return {
-                "score": 1.0 if "same" in response.choices[0].message.content.lower() else 0.0,
-                "explanation": response.choices[0].message.content
-            }
-            
-        except Exception as e:
-            logging.error(f"Error evaluating image similarity: {str(e)}")
-            return {
-                "score": 0.0,
-                "explanation": f"Error evaluating images: {str(e)}"
-            }
-            
-    def evaluate_html_similarity(self, actual_html: str, expected_html: str) -> Dict[str, Any]:
-        """
-        Evaluate similarity between actual and expected HTML
-        
-        Args:
-            actual_html: Actual HTML string
-            expected_html: Expected HTML string
-            
-        Returns:
-            Dict containing similarity score and explanation
-        """
-        try:
-            response = self.client.chat.completions.create(
-                model="gpt-4",
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "You are an expert at comparing HTML elements to determine if they refer to the same interactive element."
-                    },
-                    {
-                        "role": "user",
-                        "content": f"""Compare these two HTML elements and determine if they refer to the same interactive element:
-                        
-                        Actual HTML:
-                        {actual_html}
-                        
-                        Expected HTML:
-                        {expected_html}
-                        
-                        Focus on key attributes like id, class, role, and text content. Ignore minor differences in formatting or dynamic attributes."""
-                    }
-                ],
-                max_tokens=300
-            )
-            
-            return {
-                "score": 1.0 if "same" in response.choices[0].message.content.lower() else 0.0,
-                "explanation": response.choices[0].message.content
-            }
-            
-        except Exception as e:
-            logging.error(f"Error evaluating HTML similarity: {str(e)}")
-            return {
-                "score": 0.0,
-                "explanation": f"Error comparing HTML: {str(e)}"
-            }

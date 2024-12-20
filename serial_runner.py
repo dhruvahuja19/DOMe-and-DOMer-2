@@ -23,14 +23,14 @@ class SerialTaskRunner:
                  model,
                  output_dir: Path = None,
                  save_accessibility_tree: bool = True,
-                 wait_time: float = 2.0):
+                 wait_time: float = 3.0):
         """
         Initialize SerialTaskRunner
         
         Args:
             model: Language model to use for task parsing
             output_dir: Directory for results and screenshots
-            save_accessibility_tree: Whether to save accessibility trees
+            save_accessibility_tree: Whether to save accessibility tree
             wait_time: Wait time between actions in seconds
         """
         self.model = model
@@ -195,7 +195,7 @@ def run_serial_benchmark(
     output_dir: str,
     model,
     save_accessibility_tree: bool = True,
-    wait_time: float = 2.0
+    wait_time: float = 3.0
 ) -> List[Dict[str, Any]]:
     """
     Run benchmark tasks serially

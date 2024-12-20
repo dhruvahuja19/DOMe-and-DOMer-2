@@ -128,6 +128,58 @@ The repository includes two task sets:
 - `data/test_tasks.jsonl`: Full test set with 100+ tasks
 - `data/test_tasks_10.jsonl`: Smaller set of 10 tasks for quick testing
 
+## Detailed Setup Instructions
+- **Environment Configuration**: Copy `.env.example` to `.env` and fill in your API keys.
+- **Dependencies**: Install dependencies using `pip install -r requirements.txt`.
+- **Virtual Environment**: (Optional) Set up a virtual environment using `venv`.
+
+## Running Benchmarks
+- **Main Script**: Use `run.py` to execute benchmarks. Example:
+  ```bash
+  python run.py --tasks data/test_tasks.jsonl --output results --model gpt4
+  ```
+- **Parallel and Serial Execution**: Use `parallel_runner.py` or `serial_runner.py` for specific execution modes.
+
+## Adding New Models
+- **Model Class**: Create a new class in `models/` inheriting from `BaseModel`.
+- **Integration**: Implement required methods and integrate with `run.py`.
+- **Testing**: Validate the new model with existing task sets.
+
+## Interpreting Results
+- **Results Directory**: Check the `results/` directory for output files and logs.
+- **Evaluation**: Use `evaluate.py` to assess model performance.
+- **Logs**: Review logs for insights into model behavior and errors.
+
+## Baseline Results
+- **Reference Scores**: Baseline results are available in `results/baseline_results/`.
+- **Comparison**: Use these scores to evaluate new models or configurations.
+
+## Additional Resources
+- **Scripts**: Explore the `scripts/` directory for additional utilities.
+- **Examples**: Check the `examples/` directory for example usage and configurations.
+- **Utilities**: Use `utils.py` and other scripts in `utils/` for common tasks.
+
+## Documentation
+
+### Using the Benchmark
+- **Setup**: Ensure all dependencies are installed and API keys are configured in the `.env` file.
+- **Running Tests**: Use the `benchmark` module to run tests on different models. Specify the model and task set.
+- **Serial vs Parallel**: Use `--serial` for models with strict rate limits.
+
+### Adding New Agents
+- **Model Integration**: Implement a new model class inheriting from `BaseModel`.
+- **Configuration**: Configure API keys and model parameters in the new class.
+- **Testing**: Add the new model to the benchmark script and test with existing task sets.
+
+### Interpreting Results
+- **Output Files**: Check the `results` directory for detailed logs and evaluation scores.
+- **Error Handling**: Review logs for any errors or skipped tasks.
+- **Baseline Comparison**: Compare results against baseline scores provided in the `baseline_results` directory.
+
+### Baseline Results
+- Baseline results for each model are available for comparison.
+- Use these results to gauge the performance of new models or configurations.
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.

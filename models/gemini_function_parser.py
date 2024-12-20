@@ -1,4 +1,5 @@
 import re
+import json
 from typing import Dict, Any, Optional, List, Tuple
 
 class FunctionParser:
@@ -40,30 +41,16 @@ class FunctionParser:
                 
         return function_calls
 
-    @staticmethod
-    def extract_web_interaction(text: str) -> Optional[Dict[str, Any]]:
-        """
-        Extract web interaction details from Gemini's text output.
-        Expected format:
-        <interaction>
-        {
-            "action": "click|type|hover",
-            "selector_type": "css|xpath|id|class",
-            "selector_value": "string",
-            "input_text": "string",
-            "description": "string"
-        }
-        </interaction>
-        """
-        pattern = r'<interaction>\s*(\{[\s\S]*?\})\s*</interaction>'
-        
-        match = re.search(pattern, text)
-        if not match:
-            return None
-            
+    def extract_web_interaction(self, response_text: str) -> dict:
+        """Extract web interaction details from Gemini model response."""
         try:
-            interaction_str = match.group(1).strip()
-            return eval(interaction_str)  # Using eval since the dict might contain single quotes
-        except Exception as e:
-            print(f"Error parsing interaction: {str(e)}")
-            return None
+            # Attempt to parse the response as JSON
+            interaction_data = json.loads(response_text)
+            return interaction_data
+        except json.JSONDecodeError:
+            # Log an error if parsing fails
+            print("Failed to parse response as JSON")
+            return {}
+
+        # Additional parsing logic can be added here if needed
+        return {}

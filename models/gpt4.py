@@ -3,8 +3,12 @@ import time
 import os
 import base64
 import logging
+import re
+import tiktoken
+from pathlib import Path
 from typing import Dict, Any, Optional, Tuple
 from openai import OpenAI
+from bs4 import BeautifulSoup
 from .base import BaseModel, WebInteraction, TaskResult
 
 class GPT4Model(BaseModel):
@@ -18,9 +22,18 @@ class GPT4Model(BaseModel):
         
         self.client = OpenAI(api_key=self.api_key)
         self.max_retries = 10
-        self.model = "gpt-4"
+        self.model = "gpt-4"  # Switched to gpt-4 model
         self.temperature = 0
-        self.max_tokens = 1000
+        self.tokenizer = tiktoken.encoding_for_model("gpt-4")
+        
+        # Setup logging for skipped tasks
+        self.output_dir = Path("results/skipped_tasks")
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+        self.skipped_logger = logging.getLogger('skipped_tasks')
+        handler = logging.FileHandler(self.output_dir / 'skipped_tasks.log')
+        handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s'))
+        self.skipped_logger.addHandler(handler)
+        self.skipped_logger.setLevel(logging.INFO)
         
         # Enhanced system prompt with hover support
         self.system_prompt = """You are an AI assistant that helps users interact with web elements.
@@ -72,29 +85,73 @@ Generate interactions in this JSON format:
             time.sleep(wait_time)
             return self._call_api(messages, retry_count + 1)
         
-    def parse_task(self, task: Dict[str, Any]) -> WebInteraction:
+    def _clean_html(self, html: str) -> str:
+        """Aggressively clean and truncate HTML to reduce size while keeping key elements."""
+        # First use BeautifulSoup for robust HTML parsing
+        soup = BeautifulSoup(html, "html.parser")
+        
+        # Remove all tags except those needed for interaction
+        keep_tags = {'input', 'button', 'a', 'select', 'textarea', 'form', 'label'}
+        for tag in soup.find_all():
+            if tag.name not in keep_tags:
+                # Keep the text content but remove the tag
+                tag.replace_with(tag.get_text(' ', strip=True))
+        
+        # Keep only essential attributes
+        essential_attrs = {'id', 'class', 'name', 'type', 'value', 'href', 'role', 'aria-label'}
+        for tag in soup.find_all():
+            attrs = dict(tag.attrs)  # Create a copy since we're modifying
+            for attr in attrs:
+                if attr not in essential_attrs:
+                    del tag[attr]
+                elif attr == 'class':  # Truncate long class names
+                    classes = tag['class'][:2] if isinstance(tag['class'], list) else tag['class'].split()[:2]
+                    tag['class'] = ' '.join(classes)
+        
+        # Get the cleaned HTML
+        cleaned_html = str(soup)
+        
+        # Remove extra whitespace and newlines
+        cleaned_html = ' '.join(cleaned_html.split())
+        
+        # Truncate very long attribute values
+        cleaned_html = re.sub(r'((?:id|class|name)="[^"]{30})[^"]*"', r'\1..."', cleaned_html)
+        
+        # Remove empty or whitespace-only text nodes
+        cleaned_html = re.sub(r'>\s+<', '><', cleaned_html)
+        
+        return cleaned_html
+
+    def parse_task(self, task: Dict[str, Any], page_html: str = None) -> Optional[WebInteraction]:
         """Parse task using GPT-4 to understand the interaction."""
-        prompt = f"""Task Description: {task['task']}
-Target Element: {json.dumps(task['target_element'], indent=2)}
-Page Context: {task.get('page_context', '')}
-Previous Actions: {task.get('previous_actions', [])}
-
-Consider:
-1. Is this a multi-step interaction?
-2. Are there any loading or dynamic states to handle?
-3. What validation should be performed?
-4. For hover: what effects should we validate?
-
-Generate the optimal web interaction instruction as a JSON object."""
-
+        if page_html:
+            page_html = self._clean_html(page_html)
+            
+        # Construct messages
         messages = [
             {"role": "system", "content": self.system_prompt},
-            {"role": "user", "content": prompt}
+            {"role": "user", "content": f"""Task Description: {task['task']}
+Current Page HTML: {page_html if page_html else 'Not available'}
+
+Based on the task description and current page HTML:
+1. Determine the type of interaction needed (click, type, hover)
+2. Identify the target element using the most reliable selector
+3. Extract any input text if needed for type interactions"""}
         ]
         
+        # Check total token count before making API call
+        total_tokens = sum(len(self.tokenizer.encode(msg["content"])) for msg in messages)
+        if total_tokens > 128000:  # GPT-4 Turbo's context limit
+            self.skipped_logger.info(
+                f"Task skipped due to length - URL: {task.get('url', 'N/A')}, "
+                f"Task: {task.get('task', 'N/A')}, "
+                f"Token count: {total_tokens} (limit: 128000)"
+            )
+            return None  # Skip the task instead of using ground truth
+            
         response, error = self._call_api(messages)
         if error or not response:
-            return self._create_fallback_interaction(task)
+            return None  # Skip on API errors instead of using ground truth
             
         try:
             content = response.choices[0].message.content
@@ -111,15 +168,10 @@ Generate the optimal web interaction instruction as a JSON object."""
             print(f"Error parsing GPT-4 response: {str(e)}")
             return self._create_fallback_interaction(task)
     
-    def _create_fallback_interaction(self, task: Dict[str, Any]) -> WebInteraction:
+    def _create_fallback_interaction(self, task: Dict[str, Any]) -> Optional[WebInteraction]:
         """Create a fallback interaction when API calls or parsing fails."""
-        return WebInteraction(
-            action=task.get('interaction', 'click'),
-            selector_type=task['target_element']['type'],
-            selector_value=task['target_element']['value'],
-            input_text=task.get('input_text'),
-            description=task['task']
-        )
+        # Don't use ground truth, just skip the task
+        return None
     
     def handle_error(self, task: Dict[str, Any], error: str) -> Optional[WebInteraction]:
         """Use GPT-4 to understand and handle errors with enhanced error analysis."""
@@ -218,7 +270,7 @@ Respond with:
             # Load images
             with open(actual_img, "rb") as actual, open(expected_img, "rb") as expected:
                 response = self.client.chat.completions.create(
-                    model="gpt-4-vision-preview",
+                    model="gpt-4o",
                     messages=[
                         {
                             "role": "system",

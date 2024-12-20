@@ -30,15 +30,24 @@ The response should be a JSON object with the following structure:
     "input_text": "string" (optional)
 }"""
         
-    def parse_task(self, task: Dict[str, Any]) -> WebInteraction:
+    def parse_task(self, task: Dict[str, Any], page_html: str = None) -> WebInteraction:
         """Parse task using Claude to understand the interaction."""
         # Construct prompt
         prompt = f"""Task: {task['task']}
-Target Element: {json.dumps(task['target_element'])}
-Interaction Type: {task.get('interaction', 'click')}
-Input Text: {task.get('input_text', '')}
+Current Page HTML: {page_html if page_html else 'Not available'}
 
-Generate the web interaction instruction as a JSON object."""
+Based on the task description and current page HTML:
+1. Determine the type of interaction needed (click, type, hover)
+2. Identify the target element using the most reliable selector
+3. Extract any input text if needed for type interactions
+
+Generate the web interaction instruction as a JSON object with:
+{
+    "action": "click|type|hover",
+    "selector_type": "css|xpath|id|class",
+    "selector_value": "string",
+    "input_text": "string" (optional)
+}"""
 
         # Get Claude completion
         response = self.client.messages.create(
@@ -55,19 +64,19 @@ Generate the web interaction instruction as a JSON object."""
         try:
             interaction_data = json.loads(response.content[0].text)
             return WebInteraction(
-                action=interaction_data.get('action', task.get('interaction', 'click')),
-                selector_type=interaction_data.get('selector_type', task['target_element']['type']),
-                selector_value=interaction_data.get('selector_value', task['target_element']['value']),
-                input_text=interaction_data.get('input_text', task.get('input_text')),
+                action=interaction_data.get('action', 'click'),
+                selector_type=interaction_data.get('selector_type', 'css'),
+                selector_value=interaction_data.get('selector_value'),
+                input_text=interaction_data.get('input_text'),
                 description=task['task']
             )
         except json.JSONDecodeError:
             # Fallback to task values if Claude's response isn't valid JSON
             return WebInteraction(
-                action=task.get('interaction', 'click'),
-                selector_type=task['target_element']['type'],
-                selector_value=task['target_element']['value'],
-                input_text=task.get('input_text'),
+                action='click',
+                selector_type='css',
+                selector_value='',
+                input_text='',
                 description=task['task']
             )
     

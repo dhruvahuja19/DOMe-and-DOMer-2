@@ -1,12 +1,43 @@
 import logging
 import json
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Tuple
 from openai import OpenAI
+import time
 
 from evaluation.image_match import compare_images
 from evaluation.fuzzy_match import fuzzy_match_html
 from evaluation.parallel_eval import run_parallel_evaluation
+
+def retry_api_call(func, max_retries=3, initial_wait=1):
+    """Retry API calls with exponential backoff"""
+    def wrapper(*args, **kwargs):
+        retries = 0
+        while retries < max_retries:
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                retries += 1
+                if retries == max_retries:
+                    raise e
+                wait_time = initial_wait * (2 ** (retries - 1))
+                logging.warning(f"API call failed, retrying in {wait_time}s. Error: {str(e)}")
+                time.sleep(wait_time)
+    return wrapper
+
+@retry_api_call
+def evaluate_visual(client: OpenAI, prompt: str, ground_truth_path: str, agent_image_path: str) -> Tuple[bool, str]:
+    return compare_images(prompt=prompt, 
+                        ground_truth_path=ground_truth_path,
+                        agent_image_path=agent_image_path,
+                        openai_client=client)
+
+@retry_api_call
+def evaluate_html(client: OpenAI, task_description: str, actual_html: str, expected_html: str) -> Tuple[bool, str]:
+    return fuzzy_match_html(task_description=task_description,
+                          actual_html=actual_html,
+                          expected_html=expected_html,
+                          openai_client=client)
 
 def run_serial_evaluation(
     tasks_file: Path,
@@ -33,20 +64,20 @@ def run_serial_evaluation(
         result = next((r for r in results if r.get('task_id') == task_id), None)
         if result:
             try:
-                # Visual evaluation using compare_images
-                visual_correctness, visual_reasoning = compare_images(
+                # Visual evaluation using compare_images with retry
+                visual_correctness, visual_reasoning = evaluate_visual(
+                    client,
                     prompt=f"Task: {task['task']}\nInteraction: {task['interaction']}\nExpected: {task.get('expected_outcome', 'Complete the task as specified')}",
                     ground_truth_path=task['ground_truth']['screenshot'],
-                    agent_image_path=result["after_screenshot"],
-                    openai_client=client
+                    agent_image_path=result["after_screenshot"]
                 )
                 
-                # HTML comparison using fuzzy_match
-                html_correctness, html_reasoning = fuzzy_match_html(
+                # HTML comparison using fuzzy_match with retry
+                html_correctness, html_reasoning = evaluate_html(
+                    client,
                     task_description=f"{task['task']}\nInteraction: {task['interaction']}\nExpected: {task.get('expected_outcome', 'Complete the task as specified')}",
                     actual_html=result.get("html_element", ""),
-                    expected_html=task.get('target_html', ''),
-                    openai_client=client
+                    expected_html=task.get('target_html', '')
                 )
 
                 # Convert bool to float for scoring

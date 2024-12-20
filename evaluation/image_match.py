@@ -52,6 +52,12 @@ class ImageServer:
             
         return f"http://localhost:{self.port}/temp_images/{unique_name}"
 
+def get_base64_image(image_path):
+    """Convert image to base64 string."""
+    import base64
+    with open(image_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode('utf-8')
+
 def compare_images(prompt, ground_truth_path, agent_image_path, note=None, openai_client=None):
     if openai_client is None:
         raise ValueError("OpenAI client must be provided")
@@ -59,14 +65,10 @@ def compare_images(prompt, ground_truth_path, agent_image_path, note=None, opena
     if not os.path.exists(agent_image_path):
         return False, "Agent did not generate an image or wrong path"
     
-    # Start temporary image server
-    server = ImageServer()
-    server.start()
-    
     try:
-        # Get URLs for both images
-        ground_truth_url = server.get_url(ground_truth_path)
-        agent_image_url = server.get_url(agent_image_path)
+        # Convert images to base64
+        ground_truth_b64 = get_base64_image(ground_truth_path)
+        agent_image_b64 = get_base64_image(agent_image_path)
         
         messages = [
             {"role": "system", "content": system_prompt},
@@ -80,14 +82,14 @@ def compare_images(prompt, ground_truth_path, agent_image_path, note=None, opena
                     {
                         "type": "image_url",
                         "image_url": {
-                            "url": ground_truth_url,
+                            "url": f"data:image/png;base64,{ground_truth_b64}",
                             "detail": "low"
                         }
                     },
                     {
                         "type": "image_url",
                         "image_url": {
-                            "url": agent_image_url,
+                            "url": f"data:image/png;base64,{agent_image_b64}",
                             "detail": "low"
                         }
                     }
@@ -96,23 +98,15 @@ def compare_images(prompt, ground_truth_path, agent_image_path, note=None, opena
         ]
         
         response = openai_client.chat.completions.create(
-            model="gpt-4-vision-preview",
+            model="gpt-4o",
             messages=messages,
-            max_tokens=300,
         )
         
-        output = response.choices[0].message.content
-        correctness = "True" in output.split("\n")[0]
-        reason = "\n".join(output.split("\n")[1:])
-        
-        return correctness, reason.replace("Reason: ", "").strip()
-        
+        response_text = response.choices[0].message.content
+        if "Correctness: True" in response_text:
+            return True, response_text
+        else:
+            return False, response_text
+            
     except Exception as e:
         return False, f"Error comparing images: {str(e)}"
-    finally:
-        # Clean up
-        server.stop()
-        # Remove temporary files
-        for file in server.temp_dir.glob("*"):
-            file.unlink()
-        server.temp_dir.rmdir()

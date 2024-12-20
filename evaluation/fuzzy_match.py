@@ -18,7 +18,7 @@ def fuzzy_match_html(
     expected_html: str,
     note: str = None,
     openai_client: OpenAI = None
-) -> Tuple[bool, str]:
+) -> tuple[bool, str]:
     """Compare HTML elements using GPT-4 for semantic understanding"""
     
     if openai_client is None:

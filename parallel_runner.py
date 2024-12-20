@@ -31,7 +31,7 @@ class TaskRunner:
                  model,
                  max_workers: int = 4,
                  output_dir: Path = None,
-                 wait_time: float = 2.0,
+                 wait_time: float = 3.0,
                  page_load_timeout: int = 300,  # 5 minutes
                  element_timeout: int = 300):   # 5 minutes
         """
@@ -202,38 +202,35 @@ class TaskRunner:
         """Run tasks in parallel using ThreadPoolExecutor"""
         
         results = []
-        
-        # Process tasks in smaller batches to avoid overwhelming the system
-        batch_size = self.max_workers # Process at most 5 tasks at a time
         total_tasks = len(tasks)
         logging.info(f"Starting parallel execution of {total_tasks} tasks with {self.max_workers} workers")
         
-        for i in range(0, total_tasks, batch_size):
-            batch = tasks[i:i + batch_size]
-            batch_num = i // batch_size + 1
-            total_batches = (total_tasks + batch_size - 1) // batch_size
-            logging.info(f"Processing batch {batch_num}/{total_batches} ({len(batch)} tasks)")
+        # Use a single ThreadPoolExecutor for all tasks
+        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            # Submit all tasks at once
+            future_to_task = {
+                executor.submit(self.execute_task, task): task
+                for task in tasks
+            }
             
-            with ThreadPoolExecutor(max_workers=batch_size) as executor:
-                future_to_task = {
-                    executor.submit(self.execute_task, task): task
-                    for task in batch
-                }
-                
-                for future in as_completed(future_to_task):
-                    task = future_to_task[future]
-                    try:
-                        result = future.result()
-                        results.append(result)
-                        logging.info(f"Task {task.get('id', 'unknown')} completed with success={result['success']}")
-                    except Exception as e:
-                        error_msg = f"Error processing task {task.get('id', 'unknown')}: {str(e)}"
-                        logging.error(error_msg, exc_info=True)
-                        results.append({
-                            "task_id": task.get("id", "unknown"),
-                            "success": False,
-                            "error": str(e)
-                        })
+            completed = 0
+            # Process results as they complete
+            for future in as_completed(future_to_task):
+                task = future_to_task[future]
+                try:
+                    result = future.result()
+                    results.append(result)
+                    completed += 1
+                    logging.info(f"Task {task.get('id', 'unknown')} completed with success={result['success']} ({completed}/{total_tasks})")
+                except Exception as e:
+                    error_msg = f"Error processing task {task.get('id', 'unknown')}: {str(e)}"
+                    logging.error(error_msg, exc_info=True)
+                    results.append({
+                        "task_id": task.get("id", "unknown"),
+                        "success": False,
+                        "error": str(e)
+                    })
+                    completed += 1
         
         logging.info(f"Completed all {total_tasks} tasks")
         return results
@@ -326,7 +323,7 @@ def run_parallel_benchmark(
     output_dir: str,
     model,
     max_workers: int = 4,
-    wait_time: float = 2.0,
+    wait_time: float = 3.0,
     page_load_timeout: int = 300,  # 5 minutes
     element_timeout: int = 300     # 5 minutes
 ) -> List[Dict[str, Any]]:

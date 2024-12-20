@@ -33,12 +33,33 @@ Required dependencies:
 - requests
 - beautifulsoup4
 - openai
+- anthropic
+- google-generativeai
 - python-dotenv
 
-3. Set up your OpenAI API key in a `.env` file:
+3. Set up your API keys in a `.env` file:
 ```bash
-OPENAI_API_KEY=your_api_key_here
+OPENAI_API_KEY=your_openai_key_here
+ANTHROPIC_API_KEY=your_anthropic_key_here
+GOOGLE_API_KEY=your_google_key_here
 ```
+
+## Supported Models
+
+The benchmark currently supports the following models:
+
+1. **GPT-4 Turbo** (OpenAI)
+   - Default model for both task execution and evaluation
+   - High accuracy but subject to rate limits (3500 RPM)
+
+2. **Claude 3 Haiku** (Anthropic)
+   - Fast and efficient for task execution
+   - Subject to stricter rate limits (5 RPM)
+   - Use `--serial` flag for best results
+
+3. **Gemini 1.5 Pro** (Google)
+   - Latest version of Google's Gemini model
+   - Good balance of speed and accuracy
 
 ## Usage
 
@@ -46,84 +67,118 @@ The benchmark can be run in either serial or parallel mode:
 
 ### Parallel Mode (Default)
 ```bash
-python run.py --tasks data/dom_tasks.jsonl --output results --max-workers 4 --evaluate
+# Run with GPT-4
+python -m benchmark --model gpt4 --tasks data/test_tasks.jsonl --output-dir results
+
+# Run with Claude
+python -m benchmark --model claude --tasks data/test_tasks.jsonl --output-dir results --serial
+
+# Run with Gemini
+python -m benchmark --model gemini --tasks data/test_tasks.jsonl --output-dir results
 ```
 
 ### Serial Mode
 ```bash
-python run.py --tasks data/dom_tasks.jsonl --output results --mode serial --evaluate
+python -m benchmark --model [gpt4|claude|gemini] --tasks data/test_tasks.jsonl --output-dir results --serial
 ```
 
-### Key Arguments
-- `--tasks`: Path to JSONL file containing tasks
-- `--output`: Output directory for results
-- `--mode`: Run tasks in 'serial' or 'parallel' mode (default: parallel)
-- `--max-workers`: Number of parallel workers (default: 4)
-- `--evaluate`: Run GPT-4V evaluation after tasks complete
-- `--evaluate-mode`: Run evaluations in 'serial' or 'parallel' mode (default: parallel)
-- `--save-accessibility-tree`: Save accessibility trees for each task
-- `--wait-time`: Wait time between actions in seconds (default: 2.0)
+### Evaluation
+Results are automatically evaluated using GPT-4V for visual comparison and GPT-4 for HTML structure matching:
 
-## Directory Structure
-
-```
-DOMe-and-DOMer-2/
-├── data/
-│   ├── dom_tasks.jsonl         # Task definitions
-│   └── task_schema.json        # JSON schema for tasks
-├── evaluation/
-│   ├── auto_eval.py           # Evaluation orchestrator
-│   ├── parallel_eval.py       # Parallel evaluation implementation
-│   ├── image_match.py         # GPT-4V image comparison
-│   └── fuzzy_match.py         # HTML structure comparison
-├── parallel_runner.py         # Parallel task execution
-├── serial_runner.py          # Serial task execution
-├── utils.py                  # Shared utilities
-├── run.py                    # Main entry point
-└── pyproject.toml           # Project configuration and dependencies
-
-## Output Structure
-
-Results are saved in the specified output directory:
-```
-output_dir/
-├── results.json              # Task execution results
-├── evaluation.json           # GPT-4V evaluation results
-├── benchmark.log            # Execution logs
-├── *_before.png            # Screenshots before interaction
-├── *_after.png             # Screenshots after interaction
-└── *_tree.json            # Accessibility trees (if enabled)
+```bash
+python -m evaluate --tasks data/test_tasks.jsonl --results-dir results --output results/evaluation.json
 ```
 
 ## Task Format
 
-Tasks are defined in `data/dom_tasks.jsonl`:
-
+Tasks are defined in JSONL format with the following structure:
 ```json
 {
-    "id": "task_id",
-    "task": "Click the search box and type 'hello'",
-    "web": "https://example.com",
-    "interaction": "type",
+    "web_name": "Website Name",
+    "id": "unique_task_id",
+    "task": "Description of the interaction task",
+    "web": "https://website.url",
+    "element_type": "button|input|link",
+    "interaction": "click|type|hover",
     "target_element": {
-        "type": "css",
-        "value": "#searchbox"
+        "type": "id|class|xpath",
+        "value": "selector_value"
     },
-    "input_text": "hello",
+    "input_text": "Text to type (for type interactions)",
+    "target_html": "HTML of target element",
     "ground_truth": {
-        "screenshot": "path/to/ground_truth.png"
+        "screenshot": "path/to/screenshot.png",
+        "description": "Expected result description"
     }
 }
 ```
 
-## Evaluation
+## Rate Limits
 
-The benchmark uses GPT-4V to evaluate task success by comparing:
-1. Before/after screenshots with ground truth
-2. DOM structure changes
-3. Task completion criteria
+Different models have different rate limits:
+- GPT-4: 3500 requests per minute
+- Claude: 5 requests per minute
+- Gemini: 60 requests per minute
 
-Evaluation can be run in parallel or serial mode and produces detailed scoring and reasoning for each task.
+Use the `--serial` flag for models with strict rate limits (e.g., Claude) to avoid hitting limits.
+
+## Test Tasks
+
+The repository includes two task sets:
+- `data/test_tasks.jsonl`: Full test set with 100+ tasks
+- `data/test_tasks_10.jsonl`: Smaller set of 10 tasks for quick testing
+
+## Detailed Setup Instructions
+- **Environment Configuration**: Copy `.env.example` to `.env` and fill in your API keys.
+- **Dependencies**: Install dependencies using `pip install -r requirements.txt`.
+- **Virtual Environment**: (Optional) Set up a virtual environment using `venv`.
+
+## Running Benchmarks
+- **Main Script**: Use `run.py` to execute benchmarks. Example:
+  ```bash
+  python run.py --tasks data/test_tasks.jsonl --output results --model gpt4
+  ```
+- **Parallel and Serial Execution**: Use `parallel_runner.py` or `serial_runner.py` for specific execution modes.
+
+## Adding New Models
+- **Model Class**: Create a new class in `models/` inheriting from `BaseModel`.
+- **Integration**: Implement required methods and integrate with `run.py`.
+- **Testing**: Validate the new model with existing task sets.
+
+## Interpreting Results
+- **Results Directory**: Check the `results/` directory for output files and logs.
+- **Evaluation**: Use `evaluate.py` to assess model performance.
+- **Logs**: Review logs for insights into model behavior and errors.
+
+## Baseline Results
+- **Reference Scores**: Baseline results are available in `results/baseline_results/`.
+- **Comparison**: Use these scores to evaluate new models or configurations.
+
+## Additional Resources
+- **Scripts**: Explore the `scripts/` directory for additional utilities.
+- **Examples**: Check the `examples/` directory for example usage and configurations.
+- **Utilities**: Use `utils.py` and other scripts in `utils/` for common tasks.
+
+## Documentation
+
+### Using the Benchmark
+- **Setup**: Ensure all dependencies are installed and API keys are configured in the `.env` file.
+- **Running Tests**: Use the `benchmark` module to run tests on different models. Specify the model and task set.
+- **Serial vs Parallel**: Use `--serial` for models with strict rate limits.
+
+### Adding New Agents
+- **Model Integration**: Implement a new model class inheriting from `BaseModel`.
+- **Configuration**: Configure API keys and model parameters in the new class.
+- **Testing**: Add the new model to the benchmark script and test with existing task sets.
+
+### Interpreting Results
+- **Output Files**: Check the `results` directory for detailed logs and evaluation scores.
+- **Error Handling**: Review logs for any errors or skipped tasks.
+- **Baseline Comparison**: Compare results against baseline scores provided in the `baseline_results` directory.
+
+### Baseline Results
+- Baseline results for each model are available for comparison.
+- Use these results to gauge the performance of new models or configurations.
 
 ## Contributing
 

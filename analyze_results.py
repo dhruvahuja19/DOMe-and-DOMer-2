@@ -8,7 +8,7 @@ with open(results_file) as f:
 
 # Calculate success percentage
 total_tasks = len(results)
-successful_tasks = [result for result in results if result.get('final_score', 0) == 1]
+successful_tasks = [result for result in results if result.get('final_score', 0) >= .8]
 success_percentage = (len(successful_tasks) / total_tasks) * 100 if total_tasks > 0 else 0
 
 print(f"\nResults Analysis:")

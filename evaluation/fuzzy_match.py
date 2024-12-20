@@ -5,11 +5,18 @@ from dotenv import load_dotenv
 load_dotenv()
 
 system_prompt = """
-You are evaluating if a web automation task was completed successfully. Compare the HTML elements and determine if the task's goal was achieved, focusing on the relevant HTML changes that indicate success.
+You are evaluating if a web automation task interacted with the correct HTML element. Your goal is to verify that the agent interacted with the intended element based on the task description and HTML.
+
+Guidelines:
+1. Focus on element matching, not page state changes
+2. Check if the element's attributes (id, class, text) match the task requirements
+3. Verify the element is the correct type (button, link, input, etc.)
+4. Ignore differences in element state or content after interaction
+5. For forms/inputs, verify the correct input field was targeted
 
 Your output should be in the following format:
 Correctness: [True/False]
-Reason: [Reason for the correctness/incorrectness of the agent's output]
+Reason: [Explain if the correct element was targeted based on HTML attributes and type]
 """
 
 def fuzzy_match_html(

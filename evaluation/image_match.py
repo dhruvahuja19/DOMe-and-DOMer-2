@@ -7,11 +7,25 @@ import time
 from pathlib import Path
 
 system_prompt = """
-A task required an agent to create an image based on a prompt and your task is to compare the image it generated with the image it was supposed to generate. 
+You are evaluating if a web automation task achieved its intended final state. Your goal is to compare the final screenshot with the expected ground truth image.
+
+Guidelines:
+1. Focus on the FINAL STATE of the page, not the process
+2. Compare key visual elements that indicate task completion:
+   - For navigation: correct page/section is shown
+   - For form inputs: text appears in the right field
+   - For clicks: expected content/menu is visible
+3. Ignore temporary visual elements like:
+   - Loading indicators
+   - Tooltips
+   - Hover states
+   - Transition animations
+4. Don't try to verify the action being taken, only the end result
+5. Minor visual differences (e.g., slight layout shifts, different ads) are acceptable
 
 Your output should be in the following format:
 Correctness: [True/False]
-Reason: [Reason for the correctness/incorrectness of the agent's output]
+Reason: [Explain if the final state matches the expected outcome, focusing on key visual indicators of task completion]
 """
 
 class ImageServer:

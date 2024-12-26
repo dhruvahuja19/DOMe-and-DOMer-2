@@ -1,6 +1,6 @@
 # DOM and DOMer-2
 
-A benchmark for evaluating language models' ability to execute web element interactions.
+A First-in-Class Benchmark for Evaluating the Ability of Web Agents to Identify and Interact with Web Components
 
 ## Overview
 
